@@ -17,13 +17,17 @@ Requirements:
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
+
 import argparse
 import json
 import re
-import sys
 import warnings
-from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import List, Tuple
 
 import numpy as np
 
@@ -230,30 +234,7 @@ def extract_residue_coords(protein_file: Path, residue_specs: List[str]) -> np.n
 # ---------------------------------------------------------------------------
 
 
-def compute_box(
-    positions: np.ndarray,
-    padding: float,
-    min_size: float,
-) -> Dict[str, float]:
-    """Compute bounding box center and size from an (N, 3) coordinate array."""
-    if len(positions) == 0:
-        raise ValueError("No coordinates provided for box computation")
-
-    pos_min = positions.min(axis=0)
-    pos_max = positions.max(axis=0)
-    center = 0.5 * (pos_min + pos_max)
-    size = np.maximum(pos_max - pos_min + 2.0 * padding, min_size)
-
-    return {
-        "center_x": round(float(center[0]), 4),
-        "center_y": round(float(center[1]), 4),
-        "center_z": round(float(center[2]), 4),
-        "size_x": round(float(size[0]), 4),
-        "size_y": round(float(size[1]), 4),
-        "size_z": round(float(size[2]), 4),
-        "padding": padding,
-        "min_size": min_size,
-    }
+from atomistic_analysis.coordinates import compute_box as compute_box
 
 
 REQUIRED_BOX_KEYS = {"center_x", "center_y", "center_z", "size_x", "size_y", "size_z"}

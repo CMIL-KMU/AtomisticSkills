@@ -20,46 +20,22 @@ Requirements:
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
+
 import argparse
 import json
 import os
 
 import yaml
 
-COLUMNS = ["T_K", "mu_SERTA_xx", "mu_MRTA_xx", "mu_SERTA_yy", "mu_MRTA_yy"]
+from atomistic_analysis.edi_transport import COLUMNS as COLUMNS
 
 
-def parse_transport(path: str) -> tuple[list[dict[str, float]], dict[str, str]]:
-    """Parse an EDI transport.dat file.
-
-    Args:
-        path: Path to a ``prefix_transport.dat`` file.
-
-    Returns:
-        A tuple ``(rows, meta)`` where ``rows`` is a list of dicts keyed by
-        COLUMNS (all cm^2/Vs except T_K in kelvin) and ``meta`` holds the
-        comment-header strings (grid, window) for provenance.
-    """
-    rows: list[dict[str, float]] = []
-    meta: dict[str, str] = {}
-    with open(path) as handle:
-        for line in handle:
-            stripped = line.strip()
-            if not stripped:
-                continue
-            if stripped.startswith("#"):
-                if "Grid" in stripped:
-                    meta["grid"] = stripped.lstrip("# ").strip()
-                elif "Window" in stripped:
-                    meta["window"] = stripped.lstrip("# ").strip()
-                continue
-            fields = stripped.split()
-            if len(fields) < len(COLUMNS):
-                continue
-            rows.append({col: float(fields[i]) for i, col in enumerate(COLUMNS)})
-    if not rows:
-        raise ValueError(f"No data rows found in {path}")
-    return rows, meta
+from atomistic_analysis.edi_transport import parse_transport as parse_transport
 
 
 def main() -> None:

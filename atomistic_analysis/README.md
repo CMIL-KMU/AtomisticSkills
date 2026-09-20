@@ -60,3 +60,9 @@ accepts species, fractional coords and lattice JSON on stdin and writes PNG to
 stdout. It displays saved periodic coordinates, no inferred bonds, in Cartesian
 x/y/z and perspective views; no structure standardization occurs. Preview limit
 is 500 sites. Nonperiodic molecule rendering is outside this endpoint's scope.
+
+Version 0.2 adds the fixed supplied-data operation registry `tools`, with optional
+`analysis` and `chemistry` dependencies imported only on execution. Exact schemas,
+source provenance, output units, scientific limits and all-skill coverage are in
+[the integration audit](../docs/integrations/ANALYSIS.md). Existing transport,
+Arrhenius and shared visualization APIs retain their contracts.

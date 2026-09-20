@@ -4,12 +4,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "atomistic-analysis"
-version = "0.1.0"
+version = "0.2.0"
 description = "Reusable scientific analysis tools from AtomisticSkills"
 requires-python = ">=3.10"
-dependencies = []
+dependencies = ["jsonschema>=4,<5"]
 
 [project.optional-dependencies]
+analysis = ["ase", "pymatgen", "numpy", "scipy"]
+chemistry = ["rdkit", "numpy"]
 transport = ["pymatgen-analysis-diffusion==2025.11.15", "ase", "matplotlib", "PyYAML", "lovelyplots==1.0.2"]
 
 visualization = ["pymatviz==0.18.0", "plotly==7.0.0", "kaleido==1.4.0", "lovelyplots==1.0.2"]

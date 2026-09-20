@@ -29,12 +29,17 @@ Requirements:
 
 from __future__ import annotations
 
-import argparse
-import json
+import sys
 from pathlib import Path
 
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
+
+import argparse
+import json
+
 from rdkit import Chem
-from rdkit.Chem import AllChem, rdMolAlign
+from rdkit.Chem import AllChem
 
 
 DEFAULT_THRESHOLD_ANGSTROM = 2.0
@@ -128,77 +133,10 @@ def load_docked_poses(docked_path: Path) -> list[Chem.Mol]:
     return poses
 
 
-def check_molecule_identity(ref: Chem.Mol, probe: Chem.Mol) -> None:
-    """
-    Verify that the reference and probe molecules represent the same compound.
-
-    Compares InChIKeys (first 14 characters, the connectivity-only block) to
-    catch the silent-failure mode where a user passes a docked pose of
-    compound A against a reference of compound B: CalcRMS will happily produce
-    a plausible-looking number if the atom counts line up, but the number is
-    meaningless. We compare only the connectivity block so that protonation
-    or tautomer differences between the docked form and the crystal form do
-    not trigger a false mismatch.
-
-    Args:
-        ref: Reference molecule (crystal ligand).
-        probe: Docked pose molecule.
-
-    Raises:
-        ValueError: If the molecules appear to be different compounds.
-    """
-    try:
-        ref_key = Chem.inchi.MolToInchiKey(ref)
-        probe_key = Chem.inchi.MolToInchiKey(probe)
-    except Exception as e:
-        raise ValueError(f"Cannot compute InChIKey for identity check: {e}")
-
-    ref_connectivity = ref_key.split("-")[0]
-    probe_connectivity = probe_key.split("-")[0]
-
-    if ref_connectivity != probe_connectivity:
-        raise ValueError(
-            f"Reference and docked pose appear to be different molecules. "
-            f"Reference InChIKey: {ref_key}, "
-            f"docked pose InChIKey: {probe_key}. "
-            f"Check that --reference and --docked correspond to the same compound."
-        )
+from atomistic_analysis.molecules import check_molecule_identity as check_molecule_identity
 
 
-def symmetry_corrected_rmsd(
-    ref: Chem.Mol,
-    probe: Chem.Mol,
-) -> float:
-    """
-    Compute the minimum heavy-atom RMSD over all valid atom mappings.
-
-    Uses RDKit's CalcRMS, which enumerates molecular automorphisms (symmetry
-    mappings) and returns the minimum RMSD *without* performing rigid-body
-    alignment between probe and reference. This is the correct comparison
-    for docking validation: the docked pose and the crystal reference are
-    expected to share the receptor's coordinate frame, so any alignment step
-    would artificially deflate the RMSD and mask a failing protocol.
-
-    `symmetrizeConjugatedTerminalGroups=True` (default since RDKit 2022.09)
-    correctly handles carboxylates, nitro groups, amidinium groups, and other
-    conjugated terminal groups where the oxygens or nitrogens are chemically
-    equivalent but formally labelled differently. Passed explicitly here for
-    provenance and version independence.
-
-    Args:
-        ref: Reference molecule with 3D coordinates.
-        probe: Docked pose with 3D coordinates.
-
-    Returns:
-        Minimum in-place heavy-atom RMSD in Angstroms.
-    """
-    return float(
-        rdMolAlign.CalcRMS(
-            probe,
-            ref,
-            symmetrizeConjugatedTerminalGroups=True,
-        )
-    )
+from atomistic_analysis.molecules import symmetry_corrected_rmsd as symmetry_corrected_rmsd
 
 
 def compute_all_rmsd(

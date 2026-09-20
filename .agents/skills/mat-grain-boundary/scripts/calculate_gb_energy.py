@@ -43,10 +43,6 @@ from src.utils.research_utils import get_current_research_dir
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger("GBEnergy")
 
-# Conversion: eV/Å² → J/m²
-EV_PER_A2_TO_J_PER_M2 = 16.0218
-
-
 def parse_relax_result(json_path: Path) -> Optional[Dict]:
     """Extract total energy, n_atoms, and lattice from a relaxation result JSON.
 
@@ -113,16 +109,7 @@ def parse_relax_subdir(subdir: Path) -> Optional[Dict]:
     return {"energy": energy, "n_atoms": n_atoms, "a": a, "b": b}
 
 
-def compute_gb_energy(
-    e_gb: float,
-    n_atoms: int,
-    e_bulk_per_atom: float,
-    area_A2: float,
-) -> float:
-    """Return grain boundary energy in J/m²."""
-    delta_e = e_gb - n_atoms * e_bulk_per_atom  # eV
-    gamma = delta_e / (2.0 * area_A2)  # eV/Å²
-    return gamma * EV_PER_A2_TO_J_PER_M2  # J/m²
+from atomistic_analysis.scalars import compute_gb_energy
 
 
 def load_metadata(relaxation_dir: Path) -> Optional[Dict]:

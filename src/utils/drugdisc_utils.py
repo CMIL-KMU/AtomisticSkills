@@ -7,10 +7,12 @@ Provides standalone functions for SMILES parsing, molecule standardization,
 """
 
 import logging
-from typing import List, Tuple, Optional, Dict, Any
+from typing import List, Tuple, Optional
 
 from rdkit import Chem
-from rdkit.Chem import Descriptors, Crippen, Lipinski, QED, rdMolDescriptors
+from atomistic_analysis.molecules import mol_from_smiles as mol_from_smiles
+from atomistic_analysis.molecules import compute_descriptors as compute_descriptors
+from atomistic_analysis.molecules import compute_fingerprints as compute_fingerprints
 
 logger = logging.getLogger(__name__)
 
@@ -57,14 +59,6 @@ def parse_smiles_from_file(filepath: str) -> List[Tuple[str, Optional[str]]]:
 # ==================== Molecule Operations ====================
 
 
-def mol_from_smiles(smiles: str) -> Optional[Chem.Mol]:
-    """Convert SMILES string to RDKit molecule."""
-    try:
-        mol = Chem.MolFromSmiles(smiles)
-        return mol
-    except Exception as e:
-        logger.error(f"Failed to parse SMILES '{smiles}': {e}")
-        return None
 
 
 def standardize_mol(mol: Chem.Mol, mode: str = "cleanup") -> Optional[Chem.Mol]:
@@ -228,173 +222,6 @@ def mol_to_pdbqt(mol: Chem.Mol, output_path: str, conf_id: int = -1) -> None:
 # ==================== Molecular Descriptors ====================
 
 
-def compute_descriptors(
-    smiles: str, name: Optional[str] = None, include_sandp_tpsa: bool = False
-) -> Dict[str, Any]:
-    """
-    Compute molecular descriptors and drug-likeness heuristics.
-
-    Returns:
-        Dictionary with descriptors and validity flags
-    """
-    mol = mol_from_smiles(smiles)
-    if mol is None:
-        return {
-            "smiles": smiles,
-            "name": name or smiles,
-            "valid": False,
-            "error": "Invalid SMILES",
-        }
-
-    try:
-        # Descriptors
-        mw = round(Descriptors.MolWt(mol), 2)
-        logp = round(Crippen.MolLogP(mol), 2)
-        tpsa = round(Descriptors.TPSA(mol, includeSandP=include_sandp_tpsa), 2)
-        hbd = rdMolDescriptors.CalcNumHBD(mol)
-        # Two HBA definitions, both reported explicitly. `Lipinski.NumHAcceptors` is an
-        # alias whose meaning CHANGED between rdkit 2025.09.4 and 2025.09.6 (caffeine:
-        # 6 -> 3), so it is never called here.
-        #   hba          - strict SMARTS acceptor count: excludes amide and pyrrole-type
-        #                  N whose lone pair is delocalised. Chemically correct count.
-        #   hba_lipinski - raw N+O count. The crude surrogate Lipinski 1997 actually
-        #                  specified for the Rule of Five, and what Ro5 is scored on.
-        hba = rdMolDescriptors.CalcNumHBA(mol)
-        hba_lipinski = rdMolDescriptors.CalcNumLipinskiHBA(mol)
-        rotatable = Lipinski.NumRotatableBonds(mol)
-        num_atoms = mol.GetNumAtoms()
-        num_heavy = mol.GetNumHeavyAtoms()
-        formal_charge = Chem.GetFormalCharge(mol)
-        qed = round(QED.qed(mol), 2)
-
-        # Lipinski Ro5 -- scored on the N+O surrogate, per Lipinski 1997
-        lipinski_violations = sum([mw > 500, logp > 5, hbd > 5, hba_lipinski > 10])
-
-        # Veber
-        veber_pass = rotatable <= 10 and tpsa <= 140
-
-        return {
-            "smiles": Chem.MolToSmiles(mol),
-            "name": name or Chem.MolToSmiles(mol),
-            "valid": True,
-            "molecular_weight": mw,
-            "logp": logp,
-            "tpsa": tpsa,
-            "hbd": hbd,
-            "hba": hba,
-            "hba_lipinski": hba_lipinski,
-            "hba_definitions": {
-                "hba": "rdMolDescriptors.CalcNumHBA -- strict SMARTS acceptor count",
-                "hba_lipinski": "rdMolDescriptors.CalcNumLipinskiHBA -- N+O count, scores Ro5",
-            },
-            "rotatable_bonds": rotatable,
-            "num_atoms": num_atoms,
-            "num_heavy_atoms": num_heavy,
-            "formal_charge": formal_charge,
-            "qed": qed,
-            "lipinski_violations": lipinski_violations,
-            "lipinski_ro5_pass": lipinski_violations <= 1,
-            "veber_pass": veber_pass,
-        }
-    except Exception as e:
-        return {
-            "smiles": smiles,
-            "name": name or smiles,
-            "valid": False,
-            "error": str(e),
-        }
 
 
 # ==================== Fingerprints ====================
-
-
-def compute_fingerprints(
-    records: List[Tuple[str, Optional[str]]],
-    radius: int = 2,
-    fp_size: int = 2048,
-    use_chirality: bool = False,
-    use_features: bool = False,
-    compute_similarity: bool = True,
-) -> Dict[str, Any]:
-    """
-    Compute Morgan fingerprints and optional similarity matrix.
-
-    Returns:
-        Dictionary with fingerprints, compounds info, and optional similarity matrix
-    """
-    from rdkit.Chem import rdFingerprintGenerator
-    from rdkit import DataStructs
-
-    # Create fingerprint generator
-    if use_features:
-        invgen = rdFingerprintGenerator.GetMorganFeatureAtomInvGen()
-        fpgen = rdFingerprintGenerator.GetMorganGenerator(
-            radius=radius,
-            fpSize=fp_size,
-            includeChirality=use_chirality,
-            atomInvariantsGenerator=invgen,
-        )
-    else:
-        fpgen = rdFingerprintGenerator.GetMorganGenerator(
-            radius=radius, fpSize=fp_size, includeChirality=use_chirality
-        )
-
-    # Compute fingerprints
-    compounds = []
-    fps = []
-
-    for smiles, name in records:
-        mol = mol_from_smiles(smiles)
-        if mol is None:
-            compounds.append({"smiles": smiles, "name": name or smiles, "valid": False})
-            fps.append(None)
-            continue
-
-        try:
-            fp = fpgen.GetFingerprint(mol)
-            canonical_smiles = Chem.MolToSmiles(mol)
-
-            compounds.append(
-                {
-                    "smiles": canonical_smiles,
-                    "name": name or canonical_smiles,
-                    "valid": True,
-                    "fingerprint": fp.ToBitString(),
-                }
-            )
-            fps.append(fp)
-        except Exception as e:
-            compounds.append(
-                {
-                    "smiles": smiles,
-                    "name": name or smiles,
-                    "valid": False,
-                    "error": str(e),
-                }
-            )
-            fps.append(None)
-
-    result = {
-        "n_compounds": len(compounds),
-        "n_valid": sum(1 for c in compounds if c.get("valid")),
-        "compounds": compounds,
-    }
-
-    # Compute similarity matrix if requested
-    if compute_similarity:
-        n = len(fps)
-        matrix = [[None] * n for _ in range(n)]
-
-        valid_indices = [i for i, fp in enumerate(fps) if fp is not None]
-        valid_fps = [fps[i] for i in valid_indices]
-
-        for i, idx_i in enumerate(valid_indices):
-            for j, idx_j in enumerate(valid_indices):
-                if idx_i <= idx_j:
-                    sim = DataStructs.TanimotoSimilarity(valid_fps[i], valid_fps[j])
-                    matrix[idx_i][idx_j] = round(float(sim), 4)
-                    matrix[idx_j][idx_i] = matrix[idx_i][idx_j]
-
-        result["similarity_matrix"] = matrix
-
-    return result

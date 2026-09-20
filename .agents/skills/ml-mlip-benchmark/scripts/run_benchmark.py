@@ -16,14 +16,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def evaluate_metrics(preds, targets):
-    p = np.array(preds).flatten()
-    t = np.array(targets).flatten()
-    if len(p) == 0 or len(t) == 0:
-        return {"mae": 0.0, "rmse": 0.0}
-    mae = np.mean(np.abs(p - t))
-    rmse = np.sqrt(np.mean((p - t) ** 2))
-    return {"mae": float(mae), "rmse": float(rmse)}
+from atomistic_analysis.metrics import evaluate_metrics
 
 
 def main():
