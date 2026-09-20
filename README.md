@@ -1,3 +1,7 @@
+> **Laboratory fork:** scientific protocols and tools are reused through Anvil
+> Campaigns. See [integration boundaries](docs/anvil-integration.md) and the
+> [installable analysis API](atomistic_analysis/README.md).
+
 # AtomisticSkills
 
 ![AtomisticSkills Logo](site/logo/atomisticskills_logo.svg)
@@ -162,7 +166,7 @@ This project is optimized for use with coding AI copilots like **[Antigravity](h
 ### The `.agents/` Directory
 - **Rules (`.agents/rules/`)**: Contains project-specific standards, scientific constraints, and modeling guidelines. Coding agents automatically parse these to ensure all simulations and code follow best practices.
 - **Skills (`.agents/skills/`)**: Modular, reusable capabilities, typically at the scale of a single research task (e.g., calculate material's stability). Each skill is self-documented with instructions, scripts, and resources.
-- **Workflows (`.agents/workflows/`)**: Defines high level research procedures (e.g., workflow to design a new material). Coding agents can execute these step-by-step, managing the complex transitions between different conda environments and simulation stages.
+- **Workflows (`.agents/workflows/`)**: Defines high level research procedures (e.g., workflow to design a new material). In this fork they guide Anvil Campaign construction; recipes and machine manage execution.
 
 ---
 

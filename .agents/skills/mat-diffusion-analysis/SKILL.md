@@ -1,68 +1,79 @@
 ---
 name: mat-diffusion-analysis
-description: Calculate ionic diffusion coefficients and activation energy from MD trajectories using pymatgen.
+description: Analyze ionic self diffusion, Nernst–Einstein conductivity and Arrhenius activation energies from explicit MD trajectories or observations.
 category: [materials]
 ---
 
 # Diffusion Analysis
 
 ## Goal
-To accurately calculate the ionic diffusivity ($D$) and activation energy ($E_a$) of specific atomic species in a material using Molecular Dynamics (MD) trajectories and the Arrhenius relation: $D(T) = D_0 \exp\left(-\frac{E_a}{k_B T}\right)$.
+Use the shared `atomistic_analysis` tools to obtain reproducible provisional
+transport estimates and identify evidence missing for scientific acceptance.
 
 ## Instructions
 
-1.  **MD Preparation**: Run NVT or NPT MD simulations at multiple temperatures (typically 4-6 points between 600K and 1200K).
-    - Use the `run_md` tool from a relevant potential skill (e.g., [mace](../mace/SKILL.md) or [matgl](../matgl/SKILL.md)).
-    - **Batch Processing**: You can pass a directory or a list of CIF paths to `structure_data` to run multiple MD simulations concurrently via the MCP tool.
-    - **Supercell Expansion**: Ensure supercells are sufficiently large (> 10 Å in all dimensions). The `run_md` tool natively supports this via the `supercell_min_length` argument (defaults to 10.0 Å) which performs orthogonal expansion automatically.
-    - **Optimization**: Use the `diffusion` monitor (see [mat-md-monitors](../mat-md-monitors/SKILL.md)) to automatically stop simulations once the transport properties have converged.
-        ```python
-        mace.run_md(
-            structure_data=["candidates/A.cif", "candidates/B.cif"],
-            temperature=600,
-            supercell_min_length=10.0,
-            monitor=True,
-            monitor_type="diffusion",
-            monitor_params={"specie": "Li", "threshold": 0.05, "check_interval_ps": 5.0}
-        )
-        ```
-        *Note: If the `diffusion` monitor triggers an early stop, it will automatically save the `diffusion_{specie}.json` and `msd_{specie}.png` directly into the trajectory output directory. You can skip Step 2 and proceed directly to Step 3 for any trajectories that converged early.*
+1. Identify the source MD and its saved-frame spacing, equilibrated interval,
+   mobile species, ionic charge and temperature. Reuse approved Campaign settings;
+   ask only for missing scientific choices. Anvil owns iteration state and Jobs.
+   Use Peregrine through anvil-recipes/machine for Campaign MD; do not generate a
+   new MD script or submit through a parallel scheduler integration.
+2. Use the installed Python API or CLI. Default `smoothed=false` uses one time
+   origin; `max` uses multiple origins. Select a diffusive fit interval after
+   inspecting MSD. Short trajectories and apparent straight lines do not establish
+   convergence. Do not treat a live monitor's early stop as validated transport.
 
-2.  **Individual Diffusivity Analysis**: For each temperature directory that did *not* hit the early stopping criteria, run the analysis script to extract the diffusivity and Mean Square Displacement (MSD).
-    ```bash
-    # Env: base-agent
-    python .agents/skills/mat-diffusion-analysis/scripts/analyze_diffusion.py \
-        results/md_600K/trajectory.traj \
-        --species Li \
-        --temperature 600 \
-        --ignore_ps 5.0 \
-        --output_dir results/md_600K
-    ```
-    - `--ignore_ps`: Time to skip for equilibration. Default is 5.0 ps.
-    - The script automatically detects the frame interval from the `.log` file if present.
+```bash
+# Env: base-agent (install this checkout with pip install '.[transport]')
+atomistic-diffusion trajectory.traj --species Li --charge 1 --temperature 600 \
+  --frame-interval-fs 10 --ignore_ps 5 --smoothed false --output_dir analysis-600K
+```
 
-3.  **Activation Energy Fitting**: Once all individual results are generated, use the fitting script to combine data and perform a weighted Arrhenius fit.
-    ```bash
-    # Env: base-agent
-    python .agents/skills/mat-diffusion-analysis/scripts/calculate_activation_energy.py results/
-    ```
-    - The script looks for `md_*K/diffusion_results.json` patterns.
-    - It performs error propagation to calculate uncertainty in $E_a$ and extrapolated room-temperature conductivity.
+For physical_step-tagged Peregrine extxyz, use `--timestep-ps 0.001` instead of
+`--frame-interval-fs`. Fit lag limits: `--fit-start-ps` and `--fit-end-ps`. CLI output
+must be a new directory. Effective/default settings are in input_configs.yaml;
+JSON, MSD CSV and PNG/SVG preserve the evidence.
+
+3. Select compatible temperature observations explicitly. Each JSON row contains
+   source_uuid, temperature_K, diffusivity_cm2_s and optional conductivity_NE_mS_cm.
+   Preserve species, ionic_charge_e and method if available; mixed values are rejected.
+   In Anvil use selected Job outputs; never infer comparability from folder names.
+
+```bash
+# Env: base-agent
+atomistic-arrhenius --observations observations.json --output_dir arrhenius-analysis
+```
+
+4. Inspect exclusions, eligible temperatures and residuals. Nonpositive, missing or
+   nonfinite coefficients are excluded with reasons, not deleted from their source.
+   Repeated temperatures need explicit replicate handling. Three eligible temperatures
+   are required for regression scatter. Nernst–Einstein fitting uses sigma*T.
+5. Ask whether prediction at another temperature is wanted and which temperature.
+   Only then pass `--target-temperature-K 298.15` (example). There is no fixed Li
+   species or automatic 300 K extrapolation. Predictions assume the same mechanism.
+   Publish results through recipes with immutable source hashes and method identity.
 
 ## Examples
 
-- **Superionic Conductor (LGPS)**: A complete workflow demonstration including supercell preparation, multi-temperature MD, and final Arrhenius plotting for $Li_{10}GeP_2S_{12}$ is available in the [LGPS Example](examples/LGPS/README.md).
+The upstream [LGPS study](examples/LGPS/README.md) is historical evidence. Its
+numbers used the upstream environment/protocol; do not overwrite or present them
+as validation of a new method. See the [API contract](../../../atomistic_analysis/README.md)
+for explicit input fields and migration from the previous CLI.
 
 ## Constraints
-- **Trajectory Format**: Trajectories MUST be in ASE `.traj` format.
-- **Environments**: All analysis scripts require the **base-agent** conda environment.
-- **Linearity**: The diffusivity calculation assumes a linear diffusive regime. Always inspect the generated MSD plots to ensure linearity after the `ignore_ps` period.
-- **Atom Count**: To ensure statistical significance, the system should contain a sufficient number of mobile ions (> 20 recommended).
-- **Paths**: Always use relative paths from the project root when executing scripts.
 
-## See Also
-- [mat-md-monitors](../mat-md-monitors/SKILL.md): Real-time monitoring tools for MD simulations.
+Fixed-cell periodic solids with mobile ions and a nonempty framework are supported.
+Atom order must be preserved and frame timing explicit/uniform. NPT is not currently
+qualified. Resolve ion charge explicitly; Nernst–Einstein ignores cross correlations.
+The tool rejects nonpositive raw fitted slopes before pymatgen's positive floor.
+Fit standard errors are regression diagnostics, not independent-sample uncertainty.
+All scripts call the common package; do not implement another estimator in a skill.
+
+## References
+
+- pymatgen-analysis-diffusion, DiffusionAnalyzer and get_diffusivity_from_msd.
+- [Integration responsibilities](../../../docs/anvil-integration.md).
+
 ---
 
-**Author:** Bowen Deng
-**Contact:** [GitHub @learningmatter-mit](https://github.com/learningmatter-mit)
+**Author:** Bowen Deng (upstream); laboratory integration requested by Hoje Chun.
+**Contact:** [GitHub @CMIL-KMU](https://github.com/CMIL-KMU)

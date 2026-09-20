@@ -2,6 +2,12 @@
 description: An end-to-end generative AI workflow for discovering novel high-conductivity solid-state electrolytes (SSEs), specifically mapped for halide lithium-ion conductors.
 ---
 
+> Laboratory fork: this document supplies scientific methodology for Anvil Campaigns.
+> Anvil owns approvals, iteration state and provenance; anvil-machine owns submission.
+> Any upstream local tracking/submission examples below are reference material,
+> not instructions to create a parallel execution path.
+
+
 # Generative Discovery of Halide Solid-State Electrolytes
 
 This workflow documents the explicit steps required to transition from a conceptual material class (e.g., Li-M-X halides) to highly verified, novel superionic solid-state electrolytes (SSEs) using a hierarchical screening strategy involving generative AI, ML interatomic potentials (MLIPs), and high-fidelity DFT verification.

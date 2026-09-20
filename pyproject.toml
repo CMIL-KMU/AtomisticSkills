@@ -1,3 +1,25 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "atomistic-analysis"
+version = "0.1.0"
+description = "Reusable scientific analysis tools from AtomisticSkills"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+transport = ["pymatgen-analysis-diffusion==2025.11.15", "ase", "matplotlib", "PyYAML"]
+
+[project.scripts]
+atomistic-diffusion = "atomistic_analysis.cli:diffusion_main"
+atomistic-arrhenius = "atomistic_analysis.cli:arrhenius_main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["atomistic_analysis*"]
+
 [tool.ruff]
 target-version = "py310"
 

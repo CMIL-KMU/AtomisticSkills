@@ -2,6 +2,12 @@
 description: Workflow for benchmarking, fine-tuning, and distilling Machine Learning Interatomic Potentials (MLIPs)
 ---
 
+> Laboratory fork: this document supplies scientific methodology for Anvil Campaigns.
+> Anvil owns approvals, iteration state and provenance; anvil-machine owns submission.
+> Any upstream local tracking/submission examples below are reference material,
+> not instructions to create a parallel execution path.
+
+
 # MLIP Benchmark Finetune Workflow
 
 This workflow guides you through the process of selecting, evaluating, and improving a Machine Learning Interatomic Potential (MLIP) for a specific target simulation task.

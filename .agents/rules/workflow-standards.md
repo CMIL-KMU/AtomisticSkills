@@ -5,7 +5,7 @@ description: Rules to implement a workflow under `.agents/workflows/`
 
 # Workflow Standards
 
-All high-level research objectives in this project should be implemented as "Workflows" within the `.agents/workflows/` directory. This rule ensures consistency, discoverability, and reusability for the agent when addressing complex user requests.
+In this laboratory fork, `.agents/workflows/` holds scientific protocol references. Anvil owns executable Campaign configuration, iterations and state. Do not add an independent planning, approval, submission or monitoring system here. Preserve useful methodology and references; express steps as inputs to Campaign construction.
 
 ## What is a Workflow?
 
