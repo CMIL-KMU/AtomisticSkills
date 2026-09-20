@@ -85,6 +85,8 @@ def analyze(
         raise ValueError("temperature_K must be finite and positive")
     if cfg["species"] not in atomic_numbers:
         raise ValueError("Unknown element symbol")
+    if timestep_ps is not None and frame_interval_fs is not None:
+        raise ValueError("Specify physical timestep or saved-frame interval, not both")
     frames = read(path, ":")
     if len(frames) < 4:
         raise ValueError("At least four frames required")
@@ -117,6 +119,8 @@ def analyze(
     spacing = np.diff(times)
     if not np.allclose(spacing, spacing[0], rtol=1e-8, atol=1e-12):
         raise ValueError("Uniform saved-frame times required")
+    if cfg["smoothed"] == "max" and spacing[0] > 1.0 + 1e-12:
+        raise ValueError("pymatgen max smoothing requires saved-frame spacing <= 1 ps")
     selected = times >= cfg["equilibration_ps"] - 1e-10
     frames = [a for a, keep in zip(frames, selected) if keep]
     times = times[selected]

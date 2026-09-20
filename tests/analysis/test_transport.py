@@ -155,3 +155,20 @@ def test_changed_cell_and_invalid_configuration_fail(tmp_path):
             temperature_K=600,
             timestep_ps=0.001,
         )
+
+
+def test_conflicting_timing_and_max_lag_resolution_are_rejected(tmp_path):
+    from ase.io import read
+
+    path = trajectory(tmp_path, False)
+    frames = read(path, ":")
+    for frame in frames:
+        frame.info.clear()
+    write(path, frames)
+    cfg = dict(species="Li", charge=1, equilibration_ps=0)
+    with pytest.raises(ValueError, match="not both"):
+        analyze(path, cfg, temperature_K=600, timestep_ps=0.001, frame_interval_fs=10)
+    with pytest.raises(ValueError, match="spacing <= 1 ps"):
+        analyze(
+            path, dict(cfg, smoothed="max"), temperature_K=600, frame_interval_fs=2000
+        )
