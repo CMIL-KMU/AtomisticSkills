@@ -43,3 +43,20 @@ with a nonempty framework and preserved atom order. NPT and pure single-species
 liquids need separate validation; they are rejected here. Periodic unwrapping
 requires sufficiently frequent frames; a full cell traversal cannot be detected
 from wrapped frames alone.
+
+## Presentation
+
+Scientific exports use `plotting.plot_style()` from LovelyPlots 1.0.2 (`ipynb`).
+`plotting.browser_style()` exposes the same palette and style metadata for browser
+charts. The installed upstream stylesheet is read through Matplotlib's public file
+API because LovelyPlots' registration hook uses a removed private Matplotlib API.
+Historical saved plots are immutable; new renders use the shared style.
+
+`structure_viz.structure_3d_custom` is the original AtomisticSkills Plotly renderer,
+now importable from the wheel; the old utility path re-exports it. Install the
+`visualization` extra and an explicitly configured Chrome/Chromium executable
+(`BROWSER_PATH`) for PNG generation. `python -m atomistic_analysis.structure_cli`
+accepts species, fractional coords and lattice JSON on stdin and writes PNG to
+stdout. It displays saved periodic coordinates, no inferred bonds, in Cartesian
+x/y/z and perspective views; no structure standardization occurs. Preview limit
+is 500 sites. Nonperiodic molecule rendering is outside this endpoint's scope.

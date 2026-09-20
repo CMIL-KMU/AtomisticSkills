@@ -251,11 +251,21 @@ def analyze(
         matplotlib.use("Agg")
         import matplotlib.pyplot as plt
 
-        with plt.rc_context({"font.size": 14}):
+        from atomistic_analysis.plotting import plot_style
+
+        with plot_style():
             fig, axis = plt.subplots(figsize=(6, 5))
-            axis.plot(t / 1000, msd, label=cfg["species"] + " MSD", linewidth=2.5)
             axis.plot(
-                ft / 1000, slope * ft + intercept, "--", label="fit", linewidth=2.5
+                t / 1000, msd, label=cfg["species"] + " MSD", linewidth=2.5, marker=""
+            )
+            axis.plot(
+                ft / 1000,
+                slope * ft + intercept,
+                "--",
+                label="fit",
+                linewidth=2.5,
+                marker="",
+                color="#ee9b00",
             )
             axis.set_xlabel("Lag time (ps)", fontweight="bold")
             axis.set_ylabel("MSD (angstrom²)", fontweight="bold")

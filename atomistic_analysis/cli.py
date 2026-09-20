@@ -103,13 +103,17 @@ def plot_arrhenius(result, directory):
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    with plt.rc_context({"font.size": 14}):
+    from atomistic_analysis.plotting import plot_style
+
+    with plot_style():
         for index, fit in enumerate(result["fits"]):
             fig, axis = plt.subplots(figsize=(6, 5))
             axis.scatter(*zip(*fit["points"]), label="accepted observations")
             axis.plot(
                 *zip(*fit["line"]),
                 linewidth=2.5,
+                marker="",
+                color="#ee9b00",
                 label=f"Ea = {fit['activation_energy_eV']:.3f} eV",
             )
             axis.set_xlabel("1000 / T (K⁻¹)", fontweight="bold")

@@ -10,7 +10,9 @@ requires-python = ">=3.10"
 dependencies = []
 
 [project.optional-dependencies]
-transport = ["pymatgen-analysis-diffusion==2025.11.15", "ase", "matplotlib", "PyYAML"]
+transport = ["pymatgen-analysis-diffusion==2025.11.15", "ase", "matplotlib", "PyYAML", "lovelyplots==1.0.2"]
+
+visualization = ["pymatviz==0.18.0", "plotly==7.0.0", "kaleido==1.4.0", "lovelyplots==1.0.2"]
 
 [project.scripts]
 atomistic-diffusion = "atomistic_analysis.cli:diffusion_main"

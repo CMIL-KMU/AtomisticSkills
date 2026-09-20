@@ -8,7 +8,9 @@ description: Rules for plotting scientific figures, including plot size and font
 To maintain visual consistency and publication-quality aesthetics across all generated plots in AtomisticSkills, the following matplotlib standards **MUST** be applied to all plotting scripts.
 
 ## Global Matplotlib Settings
-Aesthetics should be set globally at the top of the plotting script or before creating figures:
+New and maintained plotting paths must use the shared LovelyPlots context (`from atomistic_analysis.plotting import plot_style`). Use `with plot_style():` around figure creation and saving; do not mutate global settings. The underlying `ipynb` stylesheet owns palette, export settings and typography. Existing historical outputs are not rewritten.
+
+The default font size remains:
 ```python
 plt.rcParams.update({'font.size': 14})
 ```
