@@ -32,3 +32,6 @@ target-version = "py310"
 ".agents/skills/**/examples/**/*.py" = ["E402"]
 "src/mcp_server/*.py" = ["E402"]
 "tests/**/*.py" = ["E402"]
+
+[tool.setuptools.package-data]
+atomistic_analysis = ["capabilities.json"]

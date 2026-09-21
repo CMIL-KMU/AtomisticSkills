@@ -1,5 +1,7 @@
 # Supplied-data analysis qualification
 
+Active Anvil material policy and v2 DB contracts: [MATERIAL_DB.md](MATERIAL_DB.md). The provider functions below remain available upstream; only the explicit 27-operation material catalog is admitted by Anvil.
+
 The 130-skill audit is in [MATRIX.md](MATRIX.md) and [skill-inventory.json](skill-inventory.json).
 Each row retains its full source instructions, CLI/function contracts, units,
 dependencies and exact remaining scope. These tutorials are not 130 executable

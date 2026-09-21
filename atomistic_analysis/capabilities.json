@@ -1,0 +1,1015 @@
+{
+  "schema": "anvil.material-catalog/v1",
+  "excluded_operations": [
+    "docking-box",
+    "molecular-descriptors",
+    "molecular-fingerprints",
+    "redocking-rmsd"
+  ],
+  "skills": [
+    {
+      "skill": "chem-bond-dissociation",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "SMILES/bond indices and charge/spin -> BDE eV and fragment structures",
+      "remaining": "Charge/spin-qualified checkpoint and Peregrine BDE execution contract absent; both-mode can omit unsupported heterolysis."
+    },
+    {
+      "skill": "chem-conformer-search",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "SMILES/conformers and force threshold eV/A -> relaxed unique conformers",
+      "remaining": "RDKit exists separately; MLIP relaxation and conformer acceptance not qualified through Peregrine."
+    },
+    {
+      "skill": "chem-db-mof",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Formula/database filters -> MOF CIF and metadata",
+      "remaining": "Remote QMOF/ARC dataset snapshots not provisioned; ARC records may lack formula so formula filtering is not reliable."
+    },
+    {
+      "skill": "chem-db-qmof",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Formula or material identifier -> QMOF structures and DFT metadata",
+      "remaining": "API access and immutable database snapshot not qualified; metadata availability is not execution evidence."
+    },
+    {
+      "skill": "chem-db-spectra",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Formula and spectral modality -> JCAMP spectra",
+      "remaining": "NIST retrieval needs network/provider response fixtures and source snapshot provenance; not a calculation recipe."
+    },
+    {
+      "skill": "chem-dft-orca-advanced-calculation",
+      "readiness": "supported-partial",
+      "operations": [
+        "orca-energy"
+      ],
+      "scope": "Normally terminated ORCA text -> final energy Hartree/eV",
+      "remaining": "Parsing decimal final energy is integrated; licensed ORCA execution and arbitrary custom input are not exposed. Orbitals/thermochemistry need format and spin-block validation."
+    },
+    {
+      "skill": "chem-dft-orca-optimization",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Molecular geometry charge/spin method -> optimized geometry and eV",
+      "remaining": "SCINE utilities absent from inspected environments and ORCA executable not qualified; no new scientific submission authorized."
+    },
+    {
+      "skill": "chem-dft-orca-singlepoint",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Molecular geometry charge/spin method -> energy gradients Hessian",
+      "remaining": "SCINE utilities and ORCA executable not qualified; standalone wrapper bypasses native execution authority."
+    },
+    {
+      "skill": "chem-docking-void",
+      "readiness": "excluded",
+      "operations": [],
+      "scope": "Host/ligand structures -> docked host guest geometry",
+      "remaining": "VOID provider and checkpoint/runtime not qualified; rigid/flexible host assumptions require explicit contract."
+    },
+    {
+      "skill": "chem-hazard-toxicity",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "PubChem compound ID -> GHS/LD50 source evidence",
+      "remaining": "Live PubChem aggregation not qualified; consensus classifications and lowest LD50 are not measured safety conclusions."
+    },
+    {
+      "skill": "chem-irc-verification",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "TS geometry and displacement -> IRC endpoints energies",
+      "remaining": "Sella plus charge/spin-qualified calculator and Peregrine IRC contract absent."
+    },
+    {
+      "skill": "chem-msms-predict",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "SMILES ionization collision energy -> fragment spectrum",
+      "remaining": "ICEBERG model/checkpoints and provider environment not provisioned; mass spectrum prediction cannot be fabricated."
+    },
+    {
+      "skill": "chem-neb-barrier",
+      "readiness": "missing-prerequisites",
+      "operations": [
+        "peregrine.simulation"
+      ],
+      "scope": "Explicit endpoints same atom order -> path and barrier eV",
+      "remaining": "Existing Peregrine NEB authority remains; AtomisticSkills standalone NEB script is not a second runner. Qualification remains backend-specific."
+    },
+    {
+      "skill": "chem-nmr-analysis",
+      "readiness": "supported-partial",
+      "operations": [
+        "nmr-deconvolution"
+      ],
+      "scope": "Supplied spectra on common ppm grid and proton counts -> mole fractions/noise/Wasserstein ppm",
+      "remaining": "Existing supplied-spectrum LP integrated with bounded grid and independent-reference checks; baseline/quantitative NMR assumptions still need review. Product/spectrum prediction and kinetics orchestration are not executed."
+    },
+    {
+      "skill": "chem-nmr-predict",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "SMILES field MHz -> 1H NMR ppm/intensity",
+      "remaining": "SPINUS service and nmrsim missing/unverified; no 13C/19F/31P predictor exists in this skill."
+    },
+    {
+      "skill": "chem-react-ot",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Reactant/product aligned atom mapping -> transition-state guess",
+      "remaining": "ReactOT repository and checkpoint environment not provisioned; prediction is not TS validation."
+    },
+    {
+      "skill": "chem-similarity-search",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "SMILES Tanimoto threshold -> PubChem candidates",
+      "remaining": "Remote similarity API response/reproducibility not qualified; local fingerprint comparison is separate."
+    },
+    {
+      "skill": "chem-solution-md",
+      "readiness": "supported-partial",
+      "operations": [
+        "rdf"
+      ],
+      "scope": "Explicit periodic frames A and element pair -> radial distribution",
+      "remaining": "ASE RDF integrated; old script assumes orthorhombic MIC and uses last-frame volume for normalization. Solvation/MD need Packmol and qualified calculator path."
+    },
+    {
+      "skill": "chem-sorption-gcmc",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Host guest T K pressure/fugacity -> loading and traces",
+      "remaining": "GCMC runtime and guest charge/spin/checkpoint not qualified; no new simulation authority introduced."
+    },
+    {
+      "skill": "chem-sorption-relax",
+      "readiness": "supported-partial",
+      "operations": [
+        "supercell"
+      ],
+      "scope": "Ordered lattice A fractional sites repeats -> expanded structure",
+      "remaining": "Structure expansion integrated; host relaxation stays with Peregrine. No automatic model selection or overlap acceptance."
+    },
+    {
+      "skill": "chem-sorption-widom",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Host guest T K insertion trials -> Henry coefficient adsorption enthalpy",
+      "remaining": "Widom provider/runtime and normalized units/checkpoint not qualified; high variance needs scientific acceptance."
+    },
+    {
+      "skill": "chem-spectrum-matcher",
+      "readiness": "supported-partial",
+      "operations": [
+        "spectrum-similarity"
+      ],
+      "scope": "Two spectra on common uniform ppm/cm^-1 axis -> dimensionless similarity",
+      "remaining": "Offline normalized scoring integrated; catalog/network prediction not integrated. No identification or mixture quantification claimed."
+    },
+    {
+      "skill": "chem-thermochemistry",
+      "readiness": "supported-partial",
+      "operations": [
+        "ideal-gas"
+      ],
+      "scope": "Geometry A real vibration energies eV T K pressure Pa spin S -> H G eV and S eV/K",
+      "remaining": "Supplied-mode ideal-gas step integrated; Hessian/relaxation and reaction bookkeeping not automatically executed."
+    },
+    {
+      "skill": "chem-ts-optimization",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Initial saddle geometry charge/spin -> TS geometry and energy",
+      "remaining": "Sella/runtime and one-imaginary-mode validation absent from qualified native path."
+    },
+    {
+      "skill": "chem-vibration",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Molecule and force calculator -> frequencies cm^-1 and modes",
+      "remaining": "Finite-difference calculator/checkpoint and molecular constraints not qualified; supplied modes can feed ideal-gas adapter."
+    },
+    {
+      "skill": "drug-admet-prediction",
+      "readiness": "excluded",
+      "operations": [],
+      "scope": "SMILES -> RDKit descriptors g/mol A^2 dimensionless heuristics",
+      "remaining": "Descriptors integrated; external ADMET prediction is unavailable and descriptors are not experimental or clinical endpoints."
+    },
+    {
+      "skill": "drug-binding-site-definition",
+      "readiness": "excluded",
+      "operations": [],
+      "scope": "Receptor/reference ligand coordinates A -> docking box center and size A",
+      "remaining": "Existing box function integrated for explicit selected coordinates; PDB/SDF residue selection remains a separate prerequisite."
+    },
+    {
+      "skill": "drug-bioactivity-assay",
+      "readiness": "excluded",
+      "operations": [],
+      "scope": "Compound identifier -> assay tables with source units",
+      "remaining": "Remote PubChem assay retrieval not qualified; heterogeneous endpoint/unit interpretation requires source records."
+    },
+    {
+      "skill": "drug-complex-system-builder",
+      "readiness": "excluded",
+      "operations": [],
+      "scope": "Prepared receptor PDB ligand SDF padding A salt mol/L -> OpenMM XML/state",
+      "remaining": "OpenMM/OpenFF/openmmforcefields absent; charges/HMR/forcefield compatibility unqualified."
+    },
+    {
+      "skill": "drug-db-chembl",
+      "readiness": "excluded",
+      "operations": [],
+      "scope": "Target UniProt or SMILES -> ChEMBL activities and molecules",
+      "remaining": "ChEMBL client/provider snapshot not provisioned; activity units and censored relations cannot be flattened."
+    },
+    {
+      "skill": "drug-db-pdb",
+      "readiness": "excluded",
+      "operations": [],
+      "scope": "PDB query/id -> structure plus validation report",
+      "remaining": "RCSB network acquisition not qualified as a frozen source artifact adapter."
+    },
+    {
+      "skill": "drug-db-pubchem",
+      "readiness": "excluded",
+      "operations": [],
+      "scope": "Name/formula/SMILES -> PubChem records",
+      "remaining": "Network acquisition not qualified; query result snapshots and record identities required."
+    },
+    {
+      "skill": "drug-docking-analysis",
+      "readiness": "excluded",
+      "operations": [],
+      "scope": "Docking scores labels and molecular descriptors -> enrichment/efficiency",
+      "remaining": "Existing enrichment mishandles ties and rounded selection fraction; SEI substitutes area 1 for zero TPSA. Scientific correction and reference validation are required before exposing results."
+    },
+    {
+      "skill": "drug-docking-vina",
+      "readiness": "excluded",
+      "operations": [],
+      "scope": "PDBQT receptor ligands box A seed -> poses and scores kcal/mol",
+      "remaining": "Vina/Meeko absent from inspected environments; no docking executable qualification or licensed-data assumption."
+    },
+    {
+      "skill": "drug-ligand-prep",
+      "readiness": "excluded",
+      "operations": [],
+      "scope": "SMILES/SDF pH stereochemistry -> protonation/tautomer conformers PDBQT",
+      "remaining": "RDKit available separately; Meeko/protomer stack and complete state provenance not qualified."
+    },
+    {
+      "skill": "drug-molecular-fingerprints",
+      "readiness": "excluded",
+      "operations": [],
+      "scope": "SMILES Morgan radius bit count chirality -> fingerprints/Tanimoto matrix",
+      "remaining": "Comparison integrated; MCP Butina code rebuilds fingerprints without requested features/chirality and uses an inconsistent pair order, so clustering is not exposed."
+    },
+    {
+      "skill": "drug-pocket-detection",
+      "readiness": "excluded",
+      "operations": [],
+      "scope": "Protein PDB -> pockets and box A",
+      "remaining": "Fpocket executable and pocket-ranking parser not qualified; visualization does not establish binding."
+    },
+    {
+      "skill": "drug-pose-validation",
+      "readiness": "excluded",
+      "operations": [],
+      "scope": "Protein ligand poses -> PoseBusters validity flags",
+      "remaining": "PoseBusters and ligand-identity/coordinate-frame fixtures absent."
+    },
+    {
+      "skill": "drug-protein-ligand-md",
+      "readiness": "excluded",
+      "operations": [],
+      "scope": "OpenMM system/state T K timestep fs duration -> trajectory/log",
+      "remaining": "OpenMM stack absent; direct standalone MD must not replace Peregrine/native recipe execution authority."
+    },
+    {
+      "skill": "drug-protein-prep",
+      "readiness": "excluded",
+      "operations": [],
+      "scope": "PDB/mmCIF chains pH missing-residue policy -> prepared protein",
+      "remaining": "PDBFixer/OpenMM unavailable; uncertain protonation/residue reconstruction requires explicit evidence."
+    },
+    {
+      "skill": "drug-redocking-rmsd",
+      "readiness": "excluded",
+      "operations": [],
+      "scope": "Reference/docked SDF in fixed receptor frame -> symmetry RMSD A",
+      "remaining": "In-place RMSD integrated for bounded 3D molblocks with exact molecular identity; PDBQT/Meeko conversion unavailable. Translation is retained."
+    },
+    {
+      "skill": "drug-retrosynthesis",
+      "readiness": "excluded",
+      "operations": [],
+      "scope": "Product SMILES -> proposed reactants/routes",
+      "remaining": "IBM RXN credentials/provider availability unverified; external predictions are not synthesis approval."
+    },
+    {
+      "skill": "drug-trajectory-analysis",
+      "readiness": "excluded",
+      "operations": [],
+      "scope": "Topology trajectory dt selection -> RMSD RMSF contacts H bonds",
+      "remaining": "MDAnalysis/MDTraj absent; alignment imaging and ligand identity need qualified topology contract."
+    },
+    {
+      "skill": "general-arxiv-search",
+      "readiness": "guidance",
+      "operations": [],
+      "scope": "Query -> paper metadata and optional PDFs",
+      "remaining": "Research acquisition guidance; network/rate limits and retained source snapshots, not a scientific calculation recipe."
+    },
+    {
+      "skill": "general-biorxiv-search",
+      "readiness": "guidance",
+      "operations": [],
+      "scope": "Query/date range -> preprint records",
+      "remaining": "Research acquisition guidance; preprint results require source verification, not a calculation adapter."
+    },
+    {
+      "skill": "general-chemical-literature",
+      "readiness": "guidance",
+      "operations": [],
+      "scope": "Compound ID -> PubChem literature cross-references",
+      "remaining": "Remote source metadata not qualified; no executable scientific result claimed."
+    },
+    {
+      "skill": "general-chemical-pricing",
+      "readiness": "guidance",
+      "operations": [],
+      "scope": "Element/compound -> dated price/source/currency",
+      "remaining": "Market acquisition guidance; source dates and purity/basis indispensable. Not a thermodynamic Result."
+    },
+    {
+      "skill": "general-deep-research",
+      "readiness": "guidance",
+      "operations": [],
+      "scope": "Research question -> cited review",
+      "remaining": "Agent literature workflow, not an executable provider API."
+    },
+    {
+      "skill": "general-fair-data-review",
+      "readiness": "guidance",
+      "operations": [],
+      "scope": "Dataset and metadata -> FAIR review",
+      "remaining": "Human/agent review rubric; no scientific calculation entrypoint."
+    },
+    {
+      "skill": "general-patent-search",
+      "readiness": "guidance",
+      "operations": [],
+      "scope": "Query -> patent documents",
+      "remaining": "Provider access/rate limits and legal interpretation are external; no calculation recipe."
+    },
+    {
+      "skill": "general-peer-review",
+      "readiness": "guidance",
+      "operations": [],
+      "scope": "Plan/manuscript/slides -> review findings",
+      "remaining": "Agent judgment and visual inspection required; no automated acceptance recipe."
+    },
+    {
+      "skill": "general-plot-digitizer",
+      "readiness": "guidance",
+      "operations": [],
+      "scope": "Image pixels plus calibrated metadata -> xy/CSV and overlay",
+      "remaining": "VLM calibration and mandatory overlay review cannot be represented as automatic scientific acceptance; CV artifact adapter remains candidate."
+    },
+    {
+      "skill": "general-presentation",
+      "readiness": "guidance",
+      "operations": [],
+      "scope": "Figures/text -> slides",
+      "remaining": "Document production and visual review; not a scientific calculation recipe."
+    },
+    {
+      "skill": "general-property-units",
+      "readiness": "guidance",
+      "operations": [],
+      "scope": "Declared physical units and conventions -> conversion guidance",
+      "remaining": "No standalone converter; eV-to-kJ/mol example multiplies the inverse ASE factor and must not be treated as a validated executable contract."
+    },
+    {
+      "skill": "general-query-literature-database",
+      "readiness": "guidance",
+      "operations": [],
+      "scope": "Question/DOI -> cited papers",
+      "remaining": "Database acquisition protocol; provider/credential availability separate from scientific execution."
+    },
+    {
+      "skill": "general-workflow-planner",
+      "readiness": "guidance",
+      "operations": [],
+      "scope": "Scientific objective -> protocol plan",
+      "remaining": "Anvil Campaign/Iteration is the only state authority; do not create a second planner."
+    },
+    {
+      "skill": "mat-amorphization",
+      "readiness": "supported-partial",
+      "operations": [
+        "supercell",
+        "rdf"
+      ],
+      "scope": "Ordered structure/repeats or trajectory -> expanded structure/RDF",
+      "remaining": "Melt-quench remains qualified Peregrine work; RDF is evidence and does not itself prove amorphization."
+    },
+    {
+      "skill": "mat-calphad-phase-diagram",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "TDB components T K P Pa compositions -> equilibrium phase diagram",
+      "remaining": "pycalphad and licensed/compatible TDB not provisioned; no database invention."
+    },
+    {
+      "skill": "mat-calphad-property-diagram",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "TDB phases composition T K -> phase fractions/properties",
+      "remaining": "pycalphad/TDB prerequisites absent; normalization and phase selection require explicit contract."
+    },
+    {
+      "skill": "mat-db-mp",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Chemical system/formula/id filters -> MP records structures tensors",
+      "remaining": "mp-api present in some environments; credentials/endpoint and immutable query snapshots not verified."
+    },
+    {
+      "skill": "mat-db-nist-janaf",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Formula phase T K -> JANAF thermodynamic table",
+      "remaining": "Network/table parser and standard-state/source units not qualified; not interchangeable with computed energies."
+    },
+    {
+      "skill": "mat-db-optimade",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "OPTIMADE filter/provider -> structure records",
+      "remaining": "Provider dialect/schema and reproducible response snapshot not qualified; arbitrary endpoints not exposed."
+    },
+    {
+      "skill": "mat-defect-energy",
+      "readiness": "supported-partial",
+      "operations": [
+        "substitute"
+      ],
+      "scope": "Ordered structure and full species replacement -> substituted structure",
+      "remaining": "No fractional/charged defect generation or formation energies exposed; chemical potentials and energy reference need complete provenance."
+    },
+    {
+      "skill": "mat-defect-energy-dft",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Charged supercells charge dielectric LOCPOT -> formation energy vs Fermi eV",
+      "remaining": "Licensed VASP outputs and finite-size correction reference contracts absent; charged-cell alignment cannot be assumed."
+    },
+    {
+      "skill": "mat-dft-electron-phonon",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "DFT input structures/kq meshes -> electron phonon observables",
+      "remaining": "Licensed VASP/DFPT backend and native jobflow adapter unqualified; scripts generate inputs, not completed results."
+    },
+    {
+      "skill": "mat-dft-electronic-transport",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "DFT bands relaxation time -> transport tensors",
+      "remaining": "VASP/BoltzTraP dependencies and scattering-time contract absent; constant tau is an assumption, not measured mobility."
+    },
+    {
+      "skill": "mat-dft-ferroelectric",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Polar/nonpolar structures path -> Berry polarization",
+      "remaining": "VASP licensed execution and polarization-branch tracking missing from native contract."
+    },
+    {
+      "skill": "mat-dft-lobster",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "VASP wavefunctions basis -> COHP/COOP bonding",
+      "remaining": "LOBSTER binary and compatible VASP output unavailable; basis/spilling quality must be reviewed."
+    },
+    {
+      "skill": "mat-dft-mixing-functionals",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Structure energy and run metadata -> MP2020 correction",
+      "remaining": "Existing script fabricates Hubbard settings and disables POTCAR checks. needs_u_correction is present in the qualified numerical worker, but bare MLIP energy still cannot establish DFT correction compatibility."
+    },
+    {
+      "skill": "mat-dft-vasp",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Structure functional kmesh settings -> VASP results",
+      "remaining": "Existing native VASP recipes remain authority; arbitrary atomate2 submit/Mongo workflows are not exposed. License/site backend unqualified here."
+    },
+    {
+      "skill": "mat-dielectric-response",
+      "readiness": "supported-partial",
+      "operations": [
+        "dielectric-chi"
+      ],
+      "scope": "Explicit frequency-dependent CHI text block photon eV -> scalar real/imaginary arrays",
+      "remaining": "Existing parser reused with unique frequency block and increasing energy checks; full tensor/LOPTICS extraction and live DFT remain separate."
+    },
+    {
+      "skill": "mat-diffusion-analysis",
+      "readiness": "missing-prerequisites",
+      "operations": [
+        "peregrine.transport"
+      ],
+      "scope": "Qualified MD trajectory dt fs species fit window -> D conductivity/Arrhenius",
+      "remaining": "Existing integrated transport/Arrhenius and provisional Result contracts preserved; adequate sampling remains a scientific acceptance requirement."
+    },
+    {
+      "skill": "mat-disorder",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Disordered primordial lattice CE T K -> ordered/MC structures",
+      "remaining": "smol/CE model absent; iterative training must use Anvil Campaign rather than script-owned state."
+    },
+    {
+      "skill": "mat-edi-mobility",
+      "readiness": "supported-partial",
+      "operations": [
+        "edi-transport",
+        "edi-lifetimes",
+        "edi-matrix",
+        "uniform-kpoints"
+      ],
+      "scope": "Supplied EDI tables T K mobility cm2/V/s energy eV rates Ry lifetime fs matrix values; mesh -> fractional reciprocal grid",
+      "remaining": "Existing exact-layout parsers and grid construction integrated; QE/EDI binaries, pseudopotentials and simulation qualification absent. Matrix normalization remains provider-specific; no inferred mobility or automatic cross-method comparison."
+    },
+    {
+      "skill": "mat-elasticity",
+      "readiness": "supported-partial",
+      "operations": [
+        "elastic-moduli"
+      ],
+      "scope": "Positive definite 6x6 stiffness GPa -> VRH elastic moduli GPa",
+      "remaining": "Aggregation integrated; strain/relax calculator and anisotropy/Debye workflow require qualified engine and density reference."
+    },
+    {
+      "skill": "mat-electrochemical-window",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Target identity complete common-reference phases -> voltage window",
+      "remaining": "Existing code matches phases by formula and clips limits to 0..10 V with artificial endpoints; unsafe for identity-specific intrinsic-window claims without science correction."
+    },
+    {
+      "skill": "mat-electronic-structure",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "DFT structure/kmesh or MP ID -> bands DOS eV",
+      "remaining": "VASP execution/MP snapshot missing; isolated plots do not provide a new calculated electronic structure."
+    },
+    {
+      "skill": "mat-elemental-energies",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Element/checkpoint name -> bundled reference eV/atom",
+      "remaining": "Bundled tables identify checkpoints by filename only, without immutable checkpoint/head/training-reference hash. Automatic joining to new calculations is not presently scientifically qualified; raw resources remain available for manual review."
+    },
+    {
+      "skill": "mat-epw-mobility",
+      "readiness": "supported-partial",
+      "operations": [
+        "wannier-spreads",
+        "epw-coupling-table",
+        "uniform-kpoints"
+      ],
+      "scope": "Supplied final Wannier text -> centers A/spreads A2; selected coupling table -> meV entries; integer mesh -> reciprocal fractions",
+      "remaining": "Existing parsers/grid integrated; QE/EPW execution absent. Automatic nearest-Fermi CBM and fixed top-four mode claims are not safe generic summaries and remain unexposed."
+    },
+    {
+      "skill": "mat-equation-of-state",
+      "readiness": "supported-partial",
+      "operations": [
+        "eos-fit"
+      ],
+      "scope": "Paired cell volumes A^3 and total energies eV -> V0 E0 B GPa",
+      "remaining": "Birch-Murnaghan supplied-data fit integrated; no volume-scan execution or thermal EOS claim."
+    },
+    {
+      "skill": "mat-grain-boundary",
+      "readiness": "supported-partial",
+      "operations": [
+        "grain-boundary-energy"
+      ],
+      "scope": "GB total eV atom count bulk eV/atom area A^2 -> gamma J/m^2",
+      "remaining": "Existing scalar function reused for exactly two interfaces; CSL structure generation/relaxation still needs qualified path. Old parser diagonal-area and zero-energy pitfalls not used."
+    },
+    {
+      "skill": "mat-grand-canonical-mc",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "CE model chemical potentials eV T K -> compositions/traces",
+      "remaining": "smol environment and CE model absent; no replacement Monte Carlo engine."
+    },
+    {
+      "skill": "mat-intercalation-voltage",
+      "readiness": "supported-partial",
+      "operations": [
+        "intercalation-voltage"
+      ],
+      "scope": "Paired host/metal total energies eV and ion counts -> V",
+      "remaining": "Existing formula only supports monovalent transfer; adapter limits Li/Na/K. Relaxation and multi-electron Mg/Ca/Zn workflows not exposed."
+    },
+    {
+      "skill": "mat-ionic-substitution",
+      "readiness": "supported-partial",
+      "operations": [
+        "substitute"
+      ],
+      "scope": "Ordered structure full species map -> substituted structure",
+      "remaining": "Direct replacement integrated; probabilistic ionic substitution/oxidation-state enumeration and MP precursor retrieval remain unavailable."
+    },
+    {
+      "skill": "mat-kinetic-monte-carlo",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Lattice event catalog barriers eV prefactors 1/s T K -> trace D",
+      "remaining": "Existing lattice KMC engine is outside Peregrine execution contract; event completeness/rate model acceptance absent. No second simulation runner added. Off-lattice KMC not implemented."
+    },
+    {
+      "skill": "mat-lammps-md",
+      "readiness": "guidance",
+      "operations": [],
+      "scope": "Backend-specific binary/environment -> LAMMPS execution guidance",
+      "remaining": "Installation/tutorial skill; preserve Peregrine execution authority and binary/environment pairing, no separate scheduler."
+    },
+    {
+      "skill": "mat-lattice-thermal-conductivity",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Structure MLIP q mesh T K -> lattice kappa W/m/K",
+      "remaining": "matcalc/phono3py absent; documented API patch and phonon stability must be qualified. Does not include metallic electronic contribution."
+    },
+    {
+      "skill": "mat-magnetic-density",
+      "readiness": "supported-partial",
+      "operations": [
+        "magnetic-moments"
+      ],
+      "scope": "Collinear species/site moments muB -> projected moment sum and ordering heuristic",
+      "remaining": "Supplied moments integrated; negative ferromagnetic sign corrected in shared provider. VASP/CHGCAR extraction and interstitial magnetization not inferred."
+    },
+    {
+      "skill": "mat-md-monitors",
+      "readiness": "missing-prerequisites",
+      "operations": [
+        "peregrine.simulation"
+      ],
+      "scope": "MD ensemble T K timestep fs -> monitoring/stop evidence",
+      "remaining": "Existing Peregrine simulation authority retained; AtomisticSkills monitor-specific thresholds are guidance, not copied into a second engine."
+    },
+    {
+      "skill": "mat-md-probability-density",
+      "readiness": "supported-partial",
+      "operations": [
+        "probability-density"
+      ],
+      "scope": "Fixed orthogonal-cell frames A species grid A explicit dt ps -> normalized raw occupancy 1/A^3",
+      "remaining": "Raw pymatgen occupancy integrated without inferred time, smoothing or log compression; no continuous conduction pathway claim. Variable cells/skew cells rejected."
+    },
+    {
+      "skill": "mat-melting-point",
+      "readiness": "supported-partial",
+      "operations": [
+        "supercell"
+      ],
+      "scope": "Structure repeats -> initial supercell",
+      "remaining": "Coexistence preparation, latent feature classifier and NVE continuation unqualified. No melting point inferred from a temperature plateau alone."
+    },
+    {
+      "skill": "mat-phase-diagram",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Chemical system and thermo type -> MP precomputed phase diagram",
+      "remaining": "This skill explicitly retrieves MP data only; custom hull adapter is attributed to mat-stability, not falsely counted as this entire workflow."
+    },
+    {
+      "skill": "mat-phase-field-conservative",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Grid dx dt steps nondimensional concentration -> FiPy field animation",
+      "remaining": "FiPy absent; model parameter units/conservation result contract and native bounded solver adapter not qualified."
+    },
+    {
+      "skill": "mat-phase-field-non-conservative",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Grid radius dt steps nondimensional order parameter -> field animation",
+      "remaining": "FiPy absent; tutorial Allen-Cahn/dendrite outputs need declared physical/nondimensional parameters and numerical verification."
+    },
+    {
+      "skill": "mat-phonon",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Structure checkpoint displacement/supercell -> frequencies THz DOS",
+      "remaining": "phonopy exists in some environments; matcalc and qualified provider contract absent; no result from an import-only check."
+    },
+    {
+      "skill": "mat-pourbaix-diagram",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Solid/aqueous entries water reference concentration M -> pH/V domains",
+      "remaining": "MP credentials/aqueous snapshot and consistent water/reference correction unavailable; cannot mix arbitrary MLIP and database energies."
+    },
+    {
+      "skill": "mat-qha-thermal-expansion",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Volume/phonon scans T K -> Gibbs/thermal expansion",
+      "remaining": "matcalc and complete dynamically stable volume scans absent; skill command references stale qha path. Linear strain and volume must not be conflated."
+    },
+    {
+      "skill": "mat-raman-spectra",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Phonopy modes structure Born/dielectric data -> Raman peaks cm^-1",
+      "remaining": "Full intensities require polarizability derivatives, not Born charges alone. Equal-weight spectra are placeholders; qualified phonon data missing."
+    },
+    {
+      "skill": "mat-random-structure-search",
+      "readiness": "supported-partial",
+      "operations": [
+        "random-cubic-structure"
+      ],
+      "scope": "Integer composition seed volume factor -> cubic-metric P1 candidate",
+      "remaining": "Existing generator reused for bounded cubic metric only; no symmetry enforcement, relaxation or stability claim. Other metrics retain unqualified volume/distance issues."
+    },
+    {
+      "skill": "mat-reaction-network",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Target precursors T K open phases -> reactions/pathways",
+      "remaining": "reaction-network/mp-api snapshot missing; combinatorial search needs bounded execution and energy compatibility."
+    },
+    {
+      "skill": "mat-sample-pes-by-md",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Structure checkpoint T K timestep clustering -> sampled configurations",
+      "remaining": "Requires engine/features/checkpoint; script launches MD directly and owns sampling loop. Use Anvil/Peregrine authority before adaptation."
+    },
+    {
+      "skill": "mat-solid-free-energy",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Pre-equilibrated crystal checkpoint T K pressure GPa -> F/G eV",
+      "remaining": "Frenkel-Ladd calculator/switching path unqualified; center-of-mass corrections explicitly absent, reversibility not guaranteed."
+    },
+    {
+      "skill": "mat-stability",
+      "readiness": "supported-partial",
+      "operations": [
+        "hull"
+      ],
+      "scope": "Identified phases total energies eV common basis -> hull eV/atom decomposition",
+      "remaining": "Custom supplied-entry hull integrated with explicit target identity; phase completeness and energy compatibility remain review obligations."
+    },
+    {
+      "skill": "mat-structure-novelty",
+      "readiness": "supported-partial",
+      "operations": [
+        "structure-match",
+        "symmetry"
+      ],
+      "scope": "Two ordered structures and tolerances -> equivalence/symmetry",
+      "remaining": "Local structural comparison integrated; no database-wide or literature novelty claim."
+    },
+    {
+      "skill": "mat-surface-adsorption",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Bulk molecule Miller index checkpoint -> adsorption energies eV",
+      "remaining": "matcalc absent; paired clean slab/gas/adsorbed reference and relaxation engine contract not qualified."
+    },
+    {
+      "skill": "mat-surface-energy",
+      "readiness": "supported-partial",
+      "operations": [
+        "slab"
+      ],
+      "scope": "Bulk ordered structure hkl thickness/vacuum A shift -> unrelaxed slab",
+      "remaining": "Slab construction integrated; energies/stoichiometry/equivalent surfaces and Wulff visualization remain separate validation work."
+    },
+    {
+      "skill": "mat-synthesis-extraction",
+      "readiness": "guidance",
+      "operations": [],
+      "scope": "Text-layer PDF -> synthesis ontology with source units",
+      "remaining": "PyMuPDF extraction plus agent interpretation, not an autonomous scientific calculation. Scanned PDFs unsupported; failed extraction must stay missing."
+    },
+    {
+      "skill": "mat-synthesis-recommendation",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Formula temperature Celsius method -> text-mined recipes DOI",
+      "remaining": "MP credentials/provider snapshot unverified; text-mined route is not experimental validation or automatic lab execution."
+    },
+    {
+      "skill": "mat-xrd-calculator",
+      "readiness": "supported-partial",
+      "operations": [
+        "xrd"
+      ],
+      "scope": "Ordered structure wavelength A angular bounds degrees -> peak angles d A relative intensity",
+      "remaining": "Unbroadened pymatgen diffraction integrated; old pseudo-Voigt width and continuous-array/hkl alignment need correction before profile admission."
+    },
+    {
+      "skill": "mat-xrd-digitizer",
+      "readiness": "guidance",
+      "operations": [],
+      "scope": "Image/visually estimated peaks -> synthetic xy profile",
+      "remaining": "Visual estimation plus invented noise/background is an approximation, not raw measured data; no automatic Rietveld acceptance."
+    },
+    {
+      "skill": "mat-xrd-phase-analysis",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Pattern xy/xrdml candidate CIF wavelength nm -> DARA phase mixtures Rwp",
+      "remaining": "DARA/Ray/BGMN absent; ICSD is licensed and COD snapshot unprovisioned. No blind external binary download."
+    },
+    {
+      "skill": "mat-xrd-refinement",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Observed xy candidate CIF instrument profile -> Rietveld fit Rwp",
+      "remaining": "DARA/BGMN runtime absent; synthetic normalization may change Rwp interpretation. Conversion helper alone does not complete refinement."
+    },
+    {
+      "skill": "ml-bayesian-optimization",
+      "readiness": "existing-integration",
+      "operations": [
+        "anvil-recipes discovery"
+      ],
+      "scope": "Observed candidate features/objectives -> typed next candidates",
+      "remaining": "Existing Anvil discovery/Campaign authority retained; script campaign_state.json is not introduced as another state ledger."
+    },
+    {
+      "skill": "ml-cluster-expansion",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Disordered lattice total-energy labels -> CE coefficients/model",
+      "remaining": "smol absent; total-vs-per-atom normalization and fixed-cell mapping need qualified contract; iterative planner remains Anvil."
+    },
+    {
+      "skill": "ml-committee-uncertainty",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Same-domain checkpoints structures -> energy/force disagreement",
+      "remaining": "Minimum qualified committee checkpoints unavailable; heterogeneous energy offsets invalidate energy-std interpretation."
+    },
+    {
+      "skill": "ml-fairchem-finetune",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Label structures energies forces stress eV/A^3 -> checkpoint/logs",
+      "remaining": "Native FairChem training dataset/checkpoint/config contract not integrated; reference energies and stress sign require explicit provenance."
+    },
+    {
+      "skill": "ml-foundation-potentials",
+      "readiness": "guidance",
+      "operations": [],
+      "scope": "Chemical domain/property/cost -> model-selection guidance",
+      "remaining": "Selection guide and local registry advice; no executable scientific result by itself."
+    },
+    {
+      "skill": "ml-generative-adit",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Unconditional generation count/seed -> CIF/XYZ candidates",
+      "remaining": "AADT checkout/public checkpoint not provisioned; composition-conditioned generation unavailable in public model."
+    },
+    {
+      "skill": "ml-generative-diffcsp",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Composition SG Wyckoff checkpoint -> candidate CIF",
+      "remaining": "DiffCSP repository/checkpoints not provisioned; examples contain nonportable paths; no demonstrated execution."
+    },
+    {
+      "skill": "ml-generative-mattergen",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Chemical system/guidance checkpoint -> candidate structures",
+      "remaining": "MatterGen checkpoint/runtime absent; public composition-exact CSP unavailable; filtering remains required."
+    },
+    {
+      "skill": "ml-mace-finetune",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Labels energy force stress split seed -> checkpoint/training history",
+      "remaining": "MACE installed in some envs; native training adapter and checkpoint/reference/data identity not qualified. No fabricated training run."
+    },
+    {
+      "skill": "ml-matgl-finetune",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Labels property weights split -> MatGL checkpoint/logs",
+      "remaining": "Installed MatGL metadata may be legacy; required model/DGL training runtime and stress conversion not qualified."
+    },
+    {
+      "skill": "ml-mlip-automl",
+      "readiness": "guidance",
+      "operations": [],
+      "scope": "Training evidence/budget -> agent-chosen hyperparameters",
+      "remaining": "Explicit agent orchestration tutorial; must use Anvil Campaign/Iteration, no second optimization ledger."
+    },
+    {
+      "skill": "ml-mlip-benchmark",
+      "readiness": "supported-partial",
+      "operations": [
+        "error-metrics"
+      ],
+      "scope": "Paired supplied predictions/targets with common units -> MAE RMSE",
+      "remaining": "Existing metric function reused with nonempty paired validation; inference/checkpoint/label generation remain provider-qualified work."
+    },
+    {
+      "skill": "ml-mlip-nvalchemi",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Batched structures backend/GPU -> energies forces MD",
+      "remaining": "NValchemi runtime unavailable; documented disabled batching paths and GPU neighbor-list hazards require backend qualification, not blanket exposure."
+    },
+    {
+      "skill": "ml-mlip-speed",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Model/checkpoint structures hardware -> latency ms/atom memory MB/atom",
+      "remaining": "Hardware/model benchmarking launches scientific MD; no new jobs authorized and runtime not qualified for this benchmark."
+    },
+    {
+      "skill": "ml-property-predict-scd",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Checkpoint dataset periodic flags -> embeddings/property predictions",
+      "remaining": "SCD upstream/checkpoints and optional private StructureCloud unavailable; templates require native GPU training and logging configuration."
+    },
+    {
+      "skill": "ml-property-predictor",
+      "readiness": "missing-prerequisites",
+      "operations": [],
+      "scope": "Labeled structures intensive/extensive target -> trained readout",
+      "remaining": "Native MACE/MatGL head-training contract unqualified; intensive/extensive treatment and model reference require tests."
+    },
+    {
+      "skill": "general-publisher-access-guard",
+      "readiness": "guidance",
+      "operations": [],
+      "scope": "DOI/URL -> policy decision OA metadata/text",
+      "remaining": "Publisher policy and retrieval guidance, not calculation; credentials/network source provenance separate. Never treat restricted full text as retrieved."
+    },
+    {
+      "skill": "drug-mmpbsa-gbsa",
+      "readiness": "excluded",
+      "operations": [],
+      "scope": "Topology trajectory force fields -> MM/PBSA or MM/GBSA kcal/mol",
+      "remaining": "OpenMM/OpenFF absent; AmberTools MMPBSA/APBS engines not qualified. Forcefield/charge/stripping consistency and missing entropy prevent automatic binding-free-energy acceptance."
+    }
+  ],
+  "approved_operations": [
+    "dielectric-chi",
+    "edi-lifetimes",
+    "edi-matrix",
+    "edi-transport",
+    "elastic-moduli",
+    "eos-fit",
+    "epw-coupling-table",
+    "error-metrics",
+    "grain-boundary-energy",
+    "hull",
+    "ideal-gas",
+    "intercalation-voltage",
+    "magnetic-moments",
+    "nmr-deconvolution",
+    "orca-energy",
+    "probability-density",
+    "random-cubic-structure",
+    "rdf",
+    "slab",
+    "spectrum-similarity",
+    "structure-match",
+    "substitute",
+    "supercell",
+    "symmetry",
+    "uniform-kpoints",
+    "wannier-spreads",
+    "xrd"
+  ]
+}
