@@ -6,7 +6,20 @@ The 130-skill audit is in [MATRIX.md](MATRIX.md) and [skill-inventory.json](skil
 Each row retains its full source instructions, CLI/function contracts, units,
 dependencies and exact remaining scope. These tutorials are not 130 executable
 recipes. The small installed `atomistic_analysis.tools` registry exposes 31 bounded
-operations; simulation remains Peregrine's responsibility and Anvil owns campaigns.
+operations; MLIP simulation remains Peregrine's responsibility and Anvil owns campaigns.
+Native VASP DFT requests, including VASP MD/NEB, belong to the external engine
+recipe lifecycle; they are not prohibited by the separate MLIP engine policy.
+
+HTVS VASP integration uses `anvil-recipes`' `vasp.htvs.protocol` entrypoint and
+`htvs/<legacy directory>/v1` scientific profiles. Anvil owns registered input
+geometries, requester/attempt state and typed Calc/Result publication; mkite owns
+native stage execution/parsing and `anvil-machine` owns site/Slurm capabilities.
+Reuse the existing analysis v2 Geom/Result bindings for postprocessing, retaining
+ResultTarget/ResultSource/ResultLink lineage. This package adds no VASP runner or
+scheduler. The complete 25-profile migration matrix and explicit blocked families
+are in `anvil-recipes/mkite_vaspsol/protocols/htvs_v1/PROTOCOL.md`; operator steps
+are in `anvil/packages/anvil-db/anvil_mcp/db/VASP_WORKFLOW.md` in the sibling
+workspace. Synthetic lifecycle tests do not establish physical convergence.
 
 [operations.json](operations.json) contains exact allowlisted input schemas and
 per-operation dependency identities. Inputs/outputs are finite JSON; unknown keys,
