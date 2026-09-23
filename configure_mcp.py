@@ -324,7 +324,9 @@ def load_mcp_servers(conda_base: str) -> dict[str, Any]:
         if match:
             env_name = match.group(1)
             server["command"] = f"{conda_base}/envs/{env_name}/bin/python"
-        env = server.get("env", {})
+        env = server.setdefault("env", {})
+        # User-site packages can shadow the selected Conda environment.
+        env["PYTHONNOUSERSITE"] = "1"
         if "PYTHONPATH" in env:
             env["PYTHONPATH"] = project_root
         # Rewrite CONDA_PREFIX so Triton's ptxas-blackwell fallback resolves

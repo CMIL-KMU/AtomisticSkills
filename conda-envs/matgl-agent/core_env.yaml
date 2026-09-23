@@ -3,7 +3,7 @@ dependencies:
   - python=3.12
   - pip
   - pip:
-    - mcp
+    - mcp>=1.12,<2
     - matgl
     - cython
     - pymatgen
@@ -11,4 +11,4 @@ dependencies:
     - matcalc
     - typing-extensions
     - pytest
-    - "-e /home/bdeng/projects/nvalchemi-toolkit"
+    - "nvalchemi-toolkit"

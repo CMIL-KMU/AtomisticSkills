@@ -45,13 +45,7 @@ class Atomate2Handler:
         if vasp_cmd:
             checks["vasp"] = True
         else:
-            # Check common location
-            vasp_bin = Path("/home/bdeng/Packages/vasp.6.4.2/bin/vasp_std")
-            if vasp_bin.exists():
-                checks["vasp"] = True
-                os.environ["ATOMATE2_VASP_CMD"] = f"mpirun -np 1 {vasp_bin}"
-            else:
-                checks["error"] = "VASP_CMD or ATOMATE2_VASP_CMD not set."
+            checks["error"] = "VASP_CMD or ATOMATE2_VASP_CMD not set."
 
         # Check POTCAR
         potcar_dir = os.environ.get("PMG_VASP_PSP_DIR")

@@ -10,7 +10,7 @@ dependencies:
   - scikit-learn
   - networkx
   - rdkit
+  - zeopp-lsmo
 
   - pip:
     - pymatgen
-    - zeopp-lsmo

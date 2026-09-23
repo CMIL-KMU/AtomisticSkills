@@ -40,7 +40,7 @@ pip install mcp fastmcp
 
 5. Clone the AADT repository:
 ```bash
-git clone https://github.com/facebookresearch/all-atom-diffusion-transformer /home/bdeng/projects/adit
+git clone https://github.com/facebookresearch/all-atom-diffusion-transformer "$ADIT_REPO_DIR"
 ```
 
 ## MCP Tool
@@ -121,6 +121,6 @@ if self.test_reconstruction_evaluators is None:
 
 ## Notes
 
-- The AADT repository is auto-discovered as a sibling directory (e.g. `../adit` relative to the project root)
+- Set `ADIT_REPO_DIR` to an explicit checkout path, or use the sibling `adit` discovery convention.
 - First run downloads ~1-2 GB of model checkpoints from HuggingFace
 - ADiT supports **dataset-type** (crystals vs molecules) and **spacegroup** conditioning only — no composition or property conditioning
