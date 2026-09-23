@@ -20,7 +20,7 @@ def save(directory, name, result, settings):
 
 def diffusion_main():
     """Analyze one trajectory with user-selected ion, charge and explicit timing."""
-    from atomistic_analysis.transport import analyze, configuration
+    from src.utils.analysis.transport import analyze, configuration
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("trajectory")
@@ -74,7 +74,7 @@ def diffusion_main():
 
 def arrhenius_main():
     """Fit explicitly listed observations; extrapolation is opt-in."""
-    from atomistic_analysis.arrhenius import fit_transport
+    from src.utils.analysis.arrhenius import fit_transport
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -103,7 +103,7 @@ def plot_arrhenius(result, directory):
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    from atomistic_analysis.plotting import plot_style
+    from src.utils.analysis.plotting import plot_style
 
     with plot_style():
         for index, fit in enumerate(result["fits"]):

@@ -1,3 +1,9 @@
+
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
+
 import argparse
 import json
 import logging
@@ -16,7 +22,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-from atomistic_analysis.metrics import evaluate_metrics
+from src.utils.analysis.metrics import evaluate_metrics
 
 
 def main():

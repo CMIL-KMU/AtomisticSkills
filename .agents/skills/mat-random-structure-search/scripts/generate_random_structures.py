@@ -81,19 +81,19 @@ COMMON_SPACEGROUPS = [
 ]
 
 
-from atomistic_analysis.random_structures import estimate_volume_per_atom as estimate_volume_per_atom
+from src.utils.analysis.random_structures import estimate_volume_per_atom as estimate_volume_per_atom
 
 
-from atomistic_analysis.random_structures import get_min_distance as get_min_distance
+from src.utils.analysis.random_structures import get_min_distance as get_min_distance
 
 
-from atomistic_analysis.random_structures import check_min_distances as check_min_distances
+from src.utils.analysis.random_structures import check_min_distances as check_min_distances
 
 
-from atomistic_analysis.random_structures import generate_random_structure as generate_random_structure
+from src.utils.analysis.random_structures import generate_random_structure as generate_random_structure
 
 
-from atomistic_analysis.random_structures import _random_lattice_params as _random_lattice_params
+from src.utils.analysis.random_structures import _random_lattice_params as _random_lattice_params
 
 
 def main() -> None:

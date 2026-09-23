@@ -25,10 +25,10 @@ if __package__ in (None, ""):
 import argparse
 
 
-from atomistic_analysis.kpoints import uniform_kpoints as uniform_kpoints
+from src.utils.analysis.kpoints import uniform_kpoints as uniform_kpoints
 
 
-from atomistic_analysis.kpoints import format_card as format_card
+from src.utils.analysis.kpoints import format_card as format_card
 
 
 def main() -> None:

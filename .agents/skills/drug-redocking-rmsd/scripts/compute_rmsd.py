@@ -133,10 +133,10 @@ def load_docked_poses(docked_path: Path) -> list[Chem.Mol]:
     return poses
 
 
-from atomistic_analysis.molecules import check_molecule_identity as check_molecule_identity
+from src.utils.analysis.molecules import check_molecule_identity as check_molecule_identity
 
 
-from atomistic_analysis.molecules import symmetry_corrected_rmsd as symmetry_corrected_rmsd
+from src.utils.analysis.molecules import symmetry_corrected_rmsd as symmetry_corrected_rmsd
 
 
 def compute_all_rmsd(

@@ -1,29 +1,3 @@
-[build-system]
-requires = ["setuptools>=61", "wheel"]
-build-backend = "setuptools.build_meta"
-
-[project]
-name = "atomistic-analysis"
-version = "0.2.0"
-description = "Reusable scientific analysis tools from AtomisticSkills"
-requires-python = ">=3.10"
-dependencies = ["jsonschema>=4,<5"]
-
-[project.optional-dependencies]
-analysis = ["ase", "pymatgen", "numpy", "scipy"]
-chemistry = ["rdkit", "numpy"]
-transport = ["pymatgen-analysis-diffusion==2025.11.15", "ase", "matplotlib", "PyYAML", "lovelyplots==1.0.2"]
-
-visualization = ["pymatviz==0.18.0", "plotly==7.0.0", "kaleido==1.4.0", "lovelyplots==1.0.2"]
-
-[project.scripts]
-atomistic-diffusion = "atomistic_analysis.cli:diffusion_main"
-atomistic-arrhenius = "atomistic_analysis.cli:arrhenius_main"
-
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["atomistic_analysis*"]
-
 [tool.ruff]
 target-version = "py310"
 
@@ -32,6 +6,3 @@ target-version = "py310"
 ".agents/skills/**/examples/**/*.py" = ["E402"]
 "src/mcp_server/*.py" = ["E402"]
 "tests/**/*.py" = ["E402"]
-
-[tool.setuptools.package-data]
-atomistic_analysis = ["capabilities.json"]

@@ -1,7 +1,7 @@
 import math
 from copy import deepcopy
 import pytest
-from atomistic_analysis.arrhenius import fit_transport, KB_EV_K
+from src.utils.analysis.arrhenius import fit_transport, KB_EV_K
 
 
 def observations():

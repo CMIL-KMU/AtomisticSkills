@@ -23,10 +23,10 @@ import json
 from typing import Dict, Any
 
 
-from atomistic_analysis.magnetism import parse_magnetic_moments as parse_magnetic_moments
+from src.utils.analysis.magnetism import parse_magnetic_moments as parse_magnetic_moments
 
 
-from atomistic_analysis.magnetism import classify_magnetic_ordering as classify_magnetic_ordering
+from src.utils.analysis.magnetism import classify_magnetic_ordering as classify_magnetic_ordering
 
 
 def format_output(analysis: Dict[str, Any]) -> str:

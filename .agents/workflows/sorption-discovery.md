@@ -2,12 +2,6 @@
 description: High-throughput screening out of promising porous materials for gas sorption
 ---
 
-> Laboratory fork: this document supplies scientific methodology for Anvil Campaigns.
-> Anvil owns approvals, iteration state and provenance; anvil-machine owns submission.
-> Any upstream local tracking/submission examples below are reference material,
-> not instructions to create a parallel execution path.
-
-
 # Sorption Discovery Workflow
 
 This workflow describes how to string together the modular sorption skills (`chem-sorption-relax`, `chem-sorption-widom`, `chem-sorption-gcmc`) to perform a complete computational screening pipeline for gas adsorption (e.g., carbon capture, gas storage) in porous frameworks like MOFs, COFs, or zeolites.

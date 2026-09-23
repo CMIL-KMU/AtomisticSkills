@@ -1,33 +1,25 @@
-# Laboratory integration boundaries
+# Optional external consumers
 
-Anvil constructs Campaigns and owns Project/Iteration state, request attribution,
-approvals, results, datasets and lineage. anvil-recipes translates versioned tool
-inputs/outputs. anvil-machine submits and monitors cluster work. Peregrine supplies
-MLIP models and torch-sim simulation. AtomisticSkills owns reusable scientific
-protocols, interpretation guidance and analysis tools.
+AtomisticSkills remains a standalone collection of workflows, skills, scripts
+and MCP tools. Its normal research workflow does not require Anvil, a Campaign,
+a database connection or a project distribution installation.
 
-The upstream `.agents/workflows` documents remain scientific references. They
-must not create a competing CSV/Markdown campaign ledger. The laboratory rules
-replace the mandatory standalone research-plan/approval ceremony with the current
-Anvil Campaign policy. Local analysis remains possible outside Anvil when requested.
-Existing atomate2/jobflow-remote tools are retained for upstream compatibility;
-they are not the laboratory Campaign submission route. Do not introduce another
-scheduler monitor or duplicate Peregrine model wrappers for these Campaigns.
+An external harness can read skill instructions and invoke existing scripts or
+MCP tools. The consumer owns planning, authorization, durable execution state,
+input bindings and result storage. Anvil-specific admission and publication rules
+live in Anvil's `anvil_core.integrations.atomistic_skills`, not in this repository.
 
-Transport and Arrhenius now share the installable `atomistic_analysis` package.
-The skill CLI and Anvil recipes are adapters to this package. Managed analysis
-uses explicit source Job/attempt/hash inputs, never directory discovery. Normal
-CLI use accepts a trajectory or explicit observation JSON, without a DB.
+The Anvil adapter invokes `tools/run_analysis.py` in a selected scientific Python
+environment. This optional JSON CLI calls the same helpers as the skill scripts;
+it neither connects back to Anvil nor creates jobs. Its protocol contains explicit
+scientific inputs and outputs, never database identities or campaign policy.
+The integration audit is maintained by anvil-recipes under `docs/atomistic-skills`.
 
-New transport analyses default to single-origin (`smoothed=False`). Historical
-max-smoothed results remain immutable. Changing method/fit range requires a new
-analysis revision/Job, and mixed methods cannot be silently combined. Excluded
-coefficients and finite-trajectory uncertainty remain visible. No scientific
-acceptance is implied by API success. Deployment must install the same versioned
-analysis wheel in worker and reader environments; Arrhenius readers need only the
-lightweight base package. Preserve commit/wheel hashes in the release receipt.
+The previous `atomistic-analysis` distribution has been removed. Shared numerical
+functions, timing validation, fit diagnostics and plotting remain source utilities
+in `src/utils/analysis`. Existing skill script paths remain available. Numerical
+dependencies still belong to the scientific environments documented by each skill.
 
-Fork development: keep `upstream` pointing to learningmatter-mit/AtomisticSkills,
-`origin` to the laboratory fork, and feature branches in separate worktrees.
-Preserve upstream attribution and the MIT license. Do not commit research inputs,
-trajectories, credentials or generated environment directories.
+Consumers upgrading from the old wheel must qualify a matching adapter and pinned
+source revision. Historical outputs remain immutable; this source change does not
+reinterpret earlier results or modify a running consumer environment.

@@ -135,7 +135,7 @@ def find_chi_outcar(input_path: str, chi_outcar: str | None = None) -> Path | No
     return None
 
 
-from atomistic_analysis.dielectric import read_text_maybe_gz as read_text_maybe_gz
+from src.utils.analysis.dielectric import read_text_maybe_gz as read_text_maybe_gz
 
 
 def find_primary_outcar(vasprun_path: Path) -> Path | None:
@@ -176,7 +176,7 @@ def ensure_frequency_dependent_calculation(vasprun_path: Path) -> None:
         )
 
 
-from atomistic_analysis.dielectric import parse_dielectric_section as parse_dielectric_section
+from src.utils.analysis.dielectric import parse_dielectric_section as parse_dielectric_section
 
 
 def summarize_dielectric(

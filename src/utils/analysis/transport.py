@@ -251,7 +251,7 @@ def analyze(
         matplotlib.use("Agg")
         import matplotlib.pyplot as plt
 
-        from atomistic_analysis.plotting import plot_style
+        from src.utils.analysis.plotting import plot_style
 
         with plot_style():
             fig, axis = plt.subplots(figsize=(6, 5))

@@ -2,12 +2,6 @@
 description: End-to-end workflow for predicting reaction products and quantifying them via Wasserstein deconvolution of a crude 1H NMR spectrum.
 ---
 
-> Laboratory fork: this document supplies scientific methodology for Anvil Campaigns.
-> Anvil owns approvals, iteration state and provenance; anvil-machine owns submission.
-> Any upstream local tracking/submission examples below are reference material,
-> not instructions to create a parallel execution path.
-
-
 # Reaction Description to NMR Quantification
 
 This workflow guides the agent through computationally identifying and quantifying the components of a reaction mixture when the starting point is a textual description of a chemical reaction and a crude 1H NMR spectrum (numeric data or an image).

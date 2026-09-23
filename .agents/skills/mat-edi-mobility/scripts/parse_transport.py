@@ -32,10 +32,10 @@ import os
 
 import yaml
 
-from atomistic_analysis.edi_transport import COLUMNS as COLUMNS
+from src.utils.analysis.edi_transport import COLUMNS as COLUMNS
 
 
-from atomistic_analysis.edi_transport import parse_transport as parse_transport
+from src.utils.analysis.edi_transport import parse_transport as parse_transport
 
 
 def main() -> None:

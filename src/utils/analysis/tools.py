@@ -279,7 +279,7 @@ def run(tool, inputs):
     if DEPENDENCIES[tool]:
         import numpy as np
     if tool == "nmr-deconvolution":
-        from atomistic_analysis.nmr import deconvolve_spectra
+        from src.utils.analysis.nmr import deconvolve_spectra
 
         axis = np.asarray(p["axis_ppm"])
         rows = [np.asarray(p["mixture"]), *map(np.asarray, p["references"])]
@@ -308,10 +308,10 @@ def run(tool, inputs):
         )
     elif tool in ("edi-transport", "edi-lifetimes", "edi-matrix", "epw-coupling-table"):
         from tempfile import TemporaryDirectory
-        from atomistic_analysis.edi_transport import parse_transport
-        from atomistic_analysis.edi_lifetime import parse_inv_tau, summarize
-        from atomistic_analysis.edi_matrix import parse_edmat
-        from atomistic_analysis.epw import parse_rows
+        from src.utils.analysis.edi_transport import parse_transport
+        from src.utils.analysis.edi_lifetime import parse_inv_tau, summarize
+        from src.utils.analysis.edi_matrix import parse_edmat
+        from src.utils.analysis.epw import parse_rows
 
         rows = [
             line.split()
@@ -382,7 +382,7 @@ def run(tool, inputs):
             "Parsed supplied output only; no engine execution or convergence acceptance"
         )
     elif tool == "wannier-spreads":
-        from atomistic_analysis.wannier import parse_wout
+        from src.utils.analysis.wannier import parse_wout
         import re
 
         result = parse_wout(p["text"])
@@ -400,7 +400,7 @@ def run(tool, inputs):
             "Printed centers and spreads; localization convergence and image folding require review"
         )
     elif tool == "uniform-kpoints":
-        from atomistic_analysis.kpoints import uniform_kpoints
+        from src.utils.analysis.kpoints import uniform_kpoints
 
         if p["mesh"][0] * p["mesh"][1] * p["mesh"][2] > 10000:
             raise ValueError("K grid exceeds 10000 points")
@@ -409,7 +409,7 @@ def run(tool, inputs):
             scope="Uniform unshifted full grid; no symmetry reduction or electronic convergence claim",
         )
     elif tool == "magnetic-moments":
-        from atomistic_analysis.magnetism import parse_magnetic_moments
+        from src.utils.analysis.magnetism import parse_magnetic_moments
 
         if len(p["species"]) != len(p["moments_muB"]):
             raise ValueError("Paired species and collinear moments required")
@@ -428,7 +428,7 @@ def run(tool, inputs):
             scope="Collinear projected site moments and threshold 0.1 muB heuristic; not an interstitial-inclusive total or magnetic ground state",
         )
     elif tool == "dielectric-chi":
-        from atomistic_analysis.dielectric import parse_dielectric_section
+        from src.utils.analysis.dielectric import parse_dielectric_section
         from tempfile import TemporaryDirectory
 
         header = {
@@ -491,7 +491,7 @@ def run(tool, inputs):
         )
     elif tool == "random-cubic-structure":
         from pymatgen.core import Composition
-        from atomistic_analysis.random_structures import generate_random_structure
+        from src.utils.analysis.random_structures import generate_random_structure
 
         composition = Composition(p["composition"])
         if not 1 <= composition.num_atoms <= 100 or any(
@@ -515,7 +515,7 @@ def run(tool, inputs):
             scope="Seeded random coordinates in cubic metric; P1 candidate, no requested space-group symmetry or stability claim",
         )
     elif tool == "docking-box":
-        from atomistic_analysis.coordinates import compute_box
+        from src.utils.analysis.coordinates import compute_box
 
         result = dict(
             **compute_box(
@@ -528,7 +528,7 @@ def run(tool, inputs):
         )
     elif tool == "redocking-rmsd":
         from rdkit import Chem
-        from atomistic_analysis.molecules import (
+        from src.utils.analysis.molecules import (
             check_molecule_identity,
             symmetry_corrected_rmsd,
         )
@@ -555,7 +555,7 @@ def run(tool, inputs):
             scope="Heavy-atom in-place RMSD; both poses must share the receptor coordinate frame",
         )
     elif tool in ("molecular-descriptors", "molecular-fingerprints"):
-        from atomistic_analysis.molecules import (
+        from src.utils.analysis.molecules import (
             compute_descriptors,
             compute_fingerprints,
         )
@@ -580,7 +580,7 @@ def run(tool, inputs):
             if result["n_valid"] != len(p["smiles"]):
                 raise ValueError("Invalid molecule or unavailable fingerprint")
     elif tool == "orca-energy":
-        from atomistic_analysis.orca import parse_energy
+        from src.utils.analysis.orca import parse_energy
         import re
 
         if "ORCA TERMINATED NORMALLY" not in p["text"] or re.search(
@@ -596,7 +596,7 @@ def run(tool, inputs):
             "Parsed supplied output; normal termination alone does not establish SCF or scientific convergence"
         )
     elif tool == "error-metrics":
-        from atomistic_analysis.metrics import evaluate_metrics
+        from src.utils.analysis.metrics import evaluate_metrics
 
         if len(p["predictions"]) != len(p["targets"]):
             raise ValueError("Paired predictions and targets required")
@@ -607,7 +607,7 @@ def run(tool, inputs):
             sample_count=len(p["targets"]),
         )
     elif tool == "spectrum-similarity":
-        from atomistic_analysis.spectra import (
+        from src.utils.analysis.spectra import (
             normalize,
             similarity_l2,
             similarity_cosine,
@@ -638,7 +638,7 @@ def run(tool, inputs):
             scope="Min-max normalized supplied spectra; no molecule identification or reference retrieval",
         )
     elif tool == "intercalation-voltage":
-        from atomistic_analysis.scalars import calculate_voltage
+        from src.utils.analysis.scalars import calculate_voltage
 
         result = calculate_voltage(
             **{k: v for k, v in p.items() if k != "energy_basis"}
@@ -648,7 +648,7 @@ def run(tool, inputs):
             scope="Monovalent transfer; common host stoichiometry and energy reference require review",
         )
     elif tool == "grain-boundary-energy":
-        from atomistic_analysis.scalars import compute_gb_energy
+        from src.utils.analysis.scalars import compute_gb_energy
 
         result = dict(
             grain_boundary_energy_J_m2=compute_gb_energy(
@@ -990,34 +990,23 @@ def dependency_version(name):
         raise
 
 
+def source_identity():
+    """Identify helper and CLI bytes without requiring Git or a Python distribution."""
+    root = Path(__file__).resolve().parents[3]
+    paths = sorted(Path(__file__).parent.glob("*.py")) + [root / "tools/run_analysis.py"]
+    files = {str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
+    return dict(files=files, sha256=hashlib.sha256(json.dumps(files, sort_keys=True).encode()).hexdigest())
+
+
 def identity(tool):
-    """Science bytes and installed numerical dependencies are distinct evidence."""
-    sources = b"".join(
-        Path(__file__).with_name(name).read_bytes()
-        for name in (
-            "tools.py",
-            "scalars.py",
-            "orca.py",
-            "spectra.py",
-            "metrics.py",
-            "molecules.py",
-            "coordinates.py",
-            "nmr.py",
-            "edi_transport.py",
-            "edi_lifetime.py",
-            "edi_matrix.py",
-            "wannier.py",
-            "kpoints.py",
-            "epw.py",
-            "magnetism.py",
-            "dielectric.py",
-            "random_structures.py",
-        )
-    )
+    """Science source and installed numerical dependencies are distinct evidence."""
+    if tool not in SCHEMAS:
+        raise ValueError("Unknown analysis tool")
+    source = source_identity()["sha256"]
     return dict(
-        source_sha256=hashlib.sha256(sources).hexdigest(),
-        versions={
+        source_sha256=source,
+        versions={"atomistic-skills-source": source, **{
             n: dependency_version(n)
-            for n in ["atomistic-analysis", "jsonschema", *DEPENDENCIES[tool]]
-        },
+            for n in ["jsonschema", *DEPENDENCIES[tool]]
+        }},
     )

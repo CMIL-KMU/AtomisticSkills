@@ -162,7 +162,7 @@ def interpolate_to_grid(
     return grid, y_grid
 
 
-from atomistic_analysis.spectra import normalize
+from src.utils.analysis.spectra import normalize
 
 
 # ---------------------------------------------------------------------------
@@ -170,13 +170,13 @@ from atomistic_analysis.spectra import normalize
 # ---------------------------------------------------------------------------
 
 
-from atomistic_analysis.spectra import similarity_l2
+from src.utils.analysis.spectra import similarity_l2
 
 
-from atomistic_analysis.spectra import similarity_cosine
+from src.utils.analysis.spectra import similarity_cosine
 
 
-from atomistic_analysis.spectra import similarity_wasserstein
+from src.utils.analysis.spectra import similarity_wasserstein
 
 
 METRIC_FNS = {

@@ -6,7 +6,7 @@ import sys
 
 def main():
     from pymatgen.core import Structure
-    from atomistic_analysis.structure_viz import structure_3d_custom
+    from src.utils.analysis.structure_viz import structure_3d_custom
 
     data = json.load(sys.stdin)
     if not 0 < len(data["species"]) <= 500:

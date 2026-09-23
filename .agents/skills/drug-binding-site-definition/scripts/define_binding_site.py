@@ -234,7 +234,7 @@ def extract_residue_coords(protein_file: Path, residue_specs: List[str]) -> np.n
 # ---------------------------------------------------------------------------
 
 
-from atomistic_analysis.coordinates import compute_box as compute_box
+from src.utils.analysis.coordinates import compute_box as compute_box
 
 
 REQUIRED_BOX_KEYS = {"center_x", "center_y", "center_z", "size_x", "size_y", "size_z"}

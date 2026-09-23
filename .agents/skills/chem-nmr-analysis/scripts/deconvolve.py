@@ -79,19 +79,19 @@ def baseline_correct(arr: np.ndarray) -> np.ndarray:
 # ---------------------------------------------------------------------------
 
 
-from atomistic_analysis.nmr import _merge_axes as _merge_axes
+from src.utils.analysis.nmr import _merge_axes as _merge_axes
 
 
-from atomistic_analysis.nmr import _intensities_on_axis as _intensities_on_axis
+from src.utils.analysis.nmr import _intensities_on_axis as _intensities_on_axis
 
 
-from atomistic_analysis.nmr import _normalize_confs as _normalize_confs
+from src.utils.analysis.nmr import _normalize_confs as _normalize_confs
 
 
-from atomistic_analysis.nmr import wasserstein_deconvolve as wasserstein_deconvolve
+from src.utils.analysis.nmr import wasserstein_deconvolve as wasserstein_deconvolve
 
 
-from atomistic_analysis.nmr import deconvolve_spectra as deconvolve_spectra
+from src.utils.analysis.nmr import deconvolve_spectra as deconvolve_spectra
 
 
 # ---------------------------------------------------------------------------

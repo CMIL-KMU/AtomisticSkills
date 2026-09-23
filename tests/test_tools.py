@@ -2,7 +2,7 @@
 
 import math
 import pytest
-from atomistic_analysis import tools
+from src.utils.analysis import tools
 
 
 @pytest.fixture

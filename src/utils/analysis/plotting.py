@@ -1,4 +1,4 @@
-"""LovelyPlots presentation shared by scientific exports and the Anvil browser."""
+"""LovelyPlots presentation shared by scientific exports and external consumers."""
 
 from contextlib import contextmanager
 from importlib.metadata import version, distribution
