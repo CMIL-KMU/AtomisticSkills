@@ -45,3 +45,9 @@ and 0.000001 eV/Å³ stress, recorded in `export-validation.json`). Input/output
 training configuration and CSV history are retained. Retain the full output folder
 for provenance. A small correlated dataset only verifies this workflow, not
 transferability or response outside its sampled structures and strains.
+
+Each loss explicitly requests its model prediction, including stress. Before fitting,
+all native DataModule E/F/stress targets must be present and finite. After fitting,
+CSV history must contain actual loss entries and validation metrics for all three
+properties; a silently skipped output is rejected. `loss_participation` records
+these checks in report schema `peregrine-mace-finetune/v2`.

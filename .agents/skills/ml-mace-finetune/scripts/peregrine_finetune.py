@@ -2,6 +2,7 @@
 # Env: peregrine-mace
 """Fine-tune a trusted local MACE checkpoint using Peregrine and explicit E/F/stress splits."""
 import argparse
+import csv
 import hashlib
 import importlib.metadata
 import json
@@ -81,6 +82,28 @@ def training_order(rows, seed):
     return [next(valid_iter if i in positions else train_iter) for i in range(n)], len(valid) / n
 
 
+def loss_terms():
+    """Explicit predictions make Peregrine request every differentiated output."""
+    return [dict(type='mse', key=key, prediction_key=key, weight=weight, scale=scale)
+            for key,weight,scale in [('energy',1.,1.),('forces',10.,1.),('stress',1.,1/GPa)]]
+
+
+def verify_loss_history(path):
+    """Absent validation metrics expose silently omitted model outputs/targets."""
+    rows = list(csv.DictReader(Path(path).open()))
+    result = {}
+    for key in ('energy', 'forces', 'stress'):
+        loss_key = 'train_' + ('per_atom_energy' if key=='energy' else key) + '_mse'
+        metric_key = 'val_' + key + '_mae'
+        losses = [float(row[loss_key]) for row in rows if row.get(loss_key)]
+        metrics = [float(row[metric_key]) for row in rows if row.get(metric_key)]
+        if not losses or not metrics or not np.isfinite(losses+metrics).all():
+            raise ValueError('Missing/nonfinite actual training participation: '+key)
+        result[key] = dict(training_batches=len(losses), validation_epochs=len(metrics),
+                           first_loss=losses[0], last_loss=losses[-1], max_loss=max(losses))
+    return result
+
+
 def predict(model, frames, device):
     """Use Peregrine's existing ASE calculator for conserving E/F/stress."""
     import torch
@@ -143,8 +166,7 @@ def run(args):
                   split=dict(val_fraction=fraction, seed=args.seed), batch_size=args.batch_size),
         training=dict(seed=args.seed, max_epochs=args.epochs, optimizer=dict(type='adam', lr=args.lr),
             scheduler=dict(type='linear_warmup_cosine', kwargs=dict(warmup_epochs=min(10,args.epochs-1), cycle_epochs=args.epochs, num_cycles=1)),
-            losses=[dict(type='mse',key='energy',weight=1.0),dict(type='mse',key='forces',weight=10.0),
-                    dict(type='mse',key='stress',weight=1.0,scale=1/GPa)],
+            losses=loss_terms(),
             metrics=[dict(type='mae',key=k) for k in ('energy','forces','stress')],
             save_top_k=1, early_stopping_patience=20, use_ema=False, log_every_n_steps=1))
     if args.trainable == 'readout':
@@ -152,6 +174,12 @@ def run(args):
     cfg = UnifiedTrainingConfig.from_dict(config)
     save(output / 'training-config.json', config)
     model = build_base_model(cfg.model, dtype=torch.float32)
+    from peregrine.train.datamodule import PeregrineDataModule
+    data = PeregrineDataModule(cfg.data, list(model.species), float(model.cutoff), dtype=torch.float32)
+    data.setup()
+    for item in [*data._train, *data._val]:
+        if any(key not in item or not torch.isfinite(item[key]).all() for key in ('energy','forces','stress')):
+            raise ValueError('A required training target was lost during data loading')
     trainable = {n:p.numel() for n,p in model.named_parameters() if p.requires_grad}
     if not trainable: raise ValueError('No trainable parameters')
     initial = {n:p.detach().cpu().clone() for n,p in model.named_parameters() if p.requires_grad}
@@ -162,6 +190,7 @@ def run(args):
     model, trainer = train_model(cfg, dtype=torch.float32, accelerator='gpu' if args.device=='cuda' else 'cpu',
         devices=1, default_root_dir=str(output / 'training'), logger=CSVLogger(str(output / 'training'),name='history'),
         enable_progress_bar=False, enable_model_summary=False, inference_mode=False)
+    participation = verify_loss_history(output / 'training/history/version_0/metrics.csv')
     best = trainer.checkpoint_callback.best_model_path
     if not best: raise ValueError('Validation did not select a checkpoint')
     selected = PotentialTrainer.load_from_checkpoint(best, map_location='cpu', model=model).model
@@ -189,7 +218,7 @@ def run(args):
         raise ValueError('Input changed during training')
     save(output / 'predictions.json', [dict(id=row['id'],split=row['split'],target={k:row[k] for k in ('energy','forces','stress')},
         before=before[i],after=after[i]) for i,row in enumerate(rows)])
-    report = dict(schema='peregrine-mace-finetune/v1',dataset_sha256=data_hash,foundation_sha256=before_hash,
+    report = dict(schema='peregrine-mace-finetune/v2',loss_participation=participation,dataset_sha256=data_hash,foundation_sha256=before_hash,
         checkpoint_sha256=checksum(output/'weights.npz'),native_checkpoint_sha256=checksum(output/'finetuned.model'),
         seed=args.seed,training_order=[rows[i]['id'] for i in order],test_ids=[r['id'] for r in rows if r['split']=='test'],
         before=metrics(rows,frames,before),after=metrics(rows,frames,after),trainable_parameters=sum(trainable.values()),
