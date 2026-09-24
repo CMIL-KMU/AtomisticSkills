@@ -7,7 +7,7 @@ from pathlib import Path
 
 def identity(provider: str) -> dict:
     """Return bytes and dependencies that determine this provider's behavior."""
-    if provider not in {"vasp", "peregrine"}:
+    if provider not in {"peregrine"}:
         raise ValueError("Unknown simulation provider")
     root = Path(__file__).resolve().parents[2]
     paths = [Path(__file__), root / "tools/run_simulation.py"]
@@ -16,7 +16,7 @@ def identity(provider: str) -> dict:
     if provider == "peregrine":
         paths += sorted((root / "src/utils/analysis").glob("*.py"))
     files = {str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
-    dependencies = ("ase", "numpy", "pymatgen", "Jinja2", "PyYAML") if provider == "vasp" else (
+    dependencies = (
         "ase", "numpy", "torch", "peregrine-pot", "peregrine-sim", "jsonschema")
     return dict(files=files, sha256=hashlib.sha256(json.dumps(files,sort_keys=True).encode()).hexdigest(),
                 versions={name:version(name) for name in dependencies})

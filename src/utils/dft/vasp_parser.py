@@ -51,7 +51,7 @@ class VASPParser:
 
         # Use pymatgen's Vasprun class
         vasprun = Vasprun(str(self.vasprun_path), parse_potcar_file=False)
-        from src.simulations.vasp.parser import ionic_observables, UNITS
+        from src.utils.dft.vasp_results import ionic_observables, UNITS
         observations = ionic_observables(vasprun)
 
         # Extract basic information
@@ -120,11 +120,8 @@ class VASPParser:
         all_results = []
 
         # Check if this is a directory with multiple structure subdirectories
-        structure_dirs = [
-            d
-            for d in self.output_dir.iterdir()
-            if d.is_dir() and d.name.startswith("structure_")
-        ]
+        structure_dirs = sorted({p.parent for p in self.output_dir.rglob("vasprun.xml")
+                                 if p.parent != self.output_dir}) if not self.vasprun_path.exists() else []
 
         if structure_dirs:
             # Multiple structures - parse each one
@@ -140,7 +137,7 @@ class VASPParser:
                         logger.warning(f"No VASP results found in {struct_dir}")
                         continue
 
-                    result["structure_id"] = struct_dir.name
+                    result["structure_id"] = str(struct_dir.relative_to(self.output_dir))
                     all_results.append(result)
                 except Exception as e:
                     logger.warning(f"Failed to parse {struct_dir}: {e}")

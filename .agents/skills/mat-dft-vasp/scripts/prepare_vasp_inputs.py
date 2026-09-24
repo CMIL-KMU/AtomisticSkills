@@ -32,7 +32,7 @@ def main():
     parser.add_argument(
         "--calculation_type",
         default="relaxation",
-        choices=["relaxation", "static", "md"],
+        choices=["relaxation", "static"],
         help="Type of calculation",
     )
     parser.add_argument(
@@ -67,12 +67,9 @@ def main():
         summary = []
         for i, struct_file in enumerate(sorted(structure_files)):
             # Create subdirectory for each structure
-            sub_name = struct_file.stem
-            if sub_name == "POSCAR":
-                sub_name = struct_file.parent.name
-
+            # Preserve relative paths and suffixes: a/Si.cif and b/Si.cif are distinct.
+            sub_name = str(struct_file.relative_to(input_path))
             sub_dir = out_path / sub_name
-            sub_dir.mkdir(parents=True, exist_ok=True)
 
             structure_loaded = load_structure_from_file(str(struct_file))
             if structure_loaded:
@@ -116,6 +113,9 @@ def main():
         print(
             f"Successfully wrote VASP input files to {args.output_dir}. Files saved: {list(files.keys())}"
         )
+
+    from src.utils.config_utils import save_skill_inputs
+    save_skill_inputs(args, args.output_dir)
 
 
 if __name__ == "__main__":

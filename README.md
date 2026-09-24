@@ -6,20 +6,11 @@
 
 ## Overview
 
-AtomisticSkills can be used independently through its skills, scripts and MCP
-tools. No Anvil installation or `atomistic-analysis` package is required. Shared
-scientific helpers live in `src/utils/analysis`; external automation may use the
-optional `tools/run_analysis.py` JSON CLI. See [consumer boundaries](docs/anvil-integration.md).
-
-This public repository owns reusable scientific skills, scripts, MCP tools and
-algorithms, including generic VASP/Peregrine preparation and analysis. Unpublished
-methods and laboratory protocol catalogs belong in a separate private extension
-repository, `atomistic-toolkit`, which reuses a pinned public revision. Anvil is an
-optional consumer for durable requests, workflows, Campaigns and database storage;
-anvil-recipes adapts tool execution/results, anvil-machine owns site/scheduler
-configuration, and an external harness makes research decisions. Public tools
-never require these consumers or call back into their databases. Discover this
-repository's skills only through `.agents/skills/`.
+Use AtomisticSkills directly through `.agents/skills/`, existing scripts and MCP
+tools. Scientific helpers remain source utilities; no project distribution is
+required. External agents can invoke the optional JSON tools described in
+[external tools](docs/external-tools.md). Planning, execution state and storage
+belong to the caller; scientific tools do not call back into a consumer service.
 
 **AtomisticSkills** is a composable framework for AI-driven atomistic materials research. Built on the **hierarchical decomposition** of complex scientific tasks into **Workflows** → **Skills** → **Tools**, it enables coding AI agents to autonomously conduct multi-stage materials, chemistry, and drug discovery research by combining modular, reusable capabilities.
 

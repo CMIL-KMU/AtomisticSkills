@@ -7,7 +7,14 @@ import numpy as np
 from ase.units import GPa
 from pymatgen.io.vasp.outputs import Vasprun, Outcar
 from pymatgen.io.vasp.inputs import Incar, Poscar, Kpoints
-from src.simulations.vasp.protocols import kpoint_data
+def kpoint_data(value):
+    if value is None:
+        return None
+    data = value.as_dict()
+    if data["labels"]:
+        data["labels"] = [label or "" for label in data["labels"]]
+    return data
+
 
 UNITS = dict(
     energy="eV",
@@ -41,6 +48,11 @@ def ionic_observables(v):
 
 
 def parse_stage(directory):
+    input_incar = Incar.from_file(Path(directory) / "INCAR")
+    if not (Path(directory) / "KPOINTS").is_file() and (
+        type(input_incar.get("KSPACING")) not in (int, float) or input_incar["KSPACING"] <= 0
+    ):
+        raise ValueError("Output lacks explicit KPOINTS or positive KSPACING")
     v = Vasprun(Path(directory) / "vasprun.xml", parse_potcar_file=False, parse_projected_eigen=False)
     outcar = Outcar(Path(directory) / "OUTCAR")
     steps = ionic_observables(v)
@@ -58,8 +70,9 @@ def parse_stage(directory):
         steps=steps,
         incar=dict(v.incar),
         engine_parameters=dict(v.parameters),
-        input_incar=dict(Incar.from_file(Path(directory) / "INCAR")),
-        input_kpoints=kpoint_data(Kpoints.from_file(Path(directory) / "KPOINTS")),
+        input_incar=dict(input_incar),
+        input_kpoints=kpoint_data(Kpoints.from_file(Path(directory) / "KPOINTS"))
+        if (Path(directory) / "KPOINTS").is_file() else None,
         input_structure=Poscar.from_file(
             Path(directory) / "POSCAR"
         ).structure.as_dict(),
