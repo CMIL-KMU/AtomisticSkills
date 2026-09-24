@@ -5,6 +5,7 @@ Lightning, ASE and pymatgen. The script imports these installed packages; it doe
 not install packages or download checkpoints. Supply a trusted local MACE model.
 
 ```bash
+# Env: peregrine-mace
 python .agents/skills/ml-mace-finetune/scripts/peregrine_finetune.py \
   --dataset dataset.json --foundation foundation.model --output-dir results \
   --seed 42 --epochs 100 --lr 0.0001 --batch-size 2 --device cuda
@@ -13,6 +14,8 @@ python .agents/skills/ml-mace-finetune/scripts/peregrine_finetune.py \
 The output directory must be empty. `--trainable readout` (default) freezes the
 backbone, preserving foundation readouts as initialization; `--trainable all`
 updates all parameters. `--head NAME` selects a foundation head where supported.
+`--provider-sha256 HASH` additionally rejects changes to installed Peregrine Python
+source files. The report always records those hashes.
 Allocate a GPU through your site's scheduler before selecting CUDA.
 
 Input JSON has `units` exactly equal to
