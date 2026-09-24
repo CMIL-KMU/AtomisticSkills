@@ -34,7 +34,10 @@ pip install lightning==2.4.0 hydra-core hydra-colorlog
 pip install e3nn==0.5.1 einops rootutils rich omegaconf torchdiffeq huggingface_hub
 pip install pymatgen ase rdkit pyxtal tqdm scipy pandas matplotlib torchmetrics
 pip install timm lmdb wandb pathos p-tqdm download
-pip install smact matminer importlib_resources
+pip install smact matminer importlib_resources posebusters
+pip install svgwrite CairoSVG reportlab svglib pythreejs ipywidgets
+pip install mofchecker pymatgen-analysis-defects orjson lovely-tensors submitit
+conda install -c conda-forge openbabel
 pip install 'mcp>=2.2,<3'
 ```
 
@@ -69,58 +72,24 @@ Pre-trained checkpoints are auto-downloaded from HuggingFace on first use:
 | e3nn | 0.5.1 |
 | pymatgen, ase | latest |
 
-## Post-Clone Patches
+## Provider validation
 
-After cloning the AADT repository, apply these patches to allow inference without `openbabel` (which is only needed for evaluation, not generation):
+Install the evaluation dependencies above even for inference: upstream imports
+its evaluators while loading the model. This avoids modifying scientific provider
+code or silently disabling evaluators. Set `ADIT_REPO_DIR` to the cloned repository
+and `HF_HOME` to an explicit model cache. Test the original wrapper from the
+AtomisticSkills repository root:
 
-1. **`src/eval/molecule_reconstruction.py`** — Make `openbabel` import optional:
-```python
-# Replace (line ~21):
-#   from openbabel import openbabel
-#   openbabel.obErrorLog.StopLogging()
-# With:
-try:
-    from openbabel import openbabel
-    openbabel.obErrorLog.StopLogging()
-except ImportError:
-    openbabel = None
+```bash
+PYTHONNOUSERSITE=1 python -c 'from src.utils.generative_models.adit.adit_wrapper import ADiTWrapper; ADiTWrapper(device="cpu")'
 ```
 
-2. **`src/eval/molecule_generation.py`** — Make `openbabel` and `posebusters` imports optional:
-```python
-# Replace (line ~11):
-#   from openbabel import openbabel
-#   from posebusters import PoseBusters
-# With:
-try:
-    from openbabel import openbabel
-    openbabel.obErrorLog.StopLogging()
-except ImportError:
-    openbabel = None
-try:
-    from posebusters import PoseBusters
-except ImportError:
-    PoseBusters = None
-```
-
-3. **`src/models/vae_module.py`** — Defer evaluator instantiation to avoid openbabel at model load time:
-```python
-# In __init__ (line ~177), replace eager evaluator creation:
-#   self.val_reconstruction_evaluators = { "mp20": ..., "qm9": MoleculeReconstructionEvaluator(), ... }
-#   self.test_reconstruction_evaluators = { ... }
-# With:
-self.val_reconstruction_evaluators = None
-self.test_reconstruction_evaluators = None
-
-# In on_evaluation_epoch_start(), add lazy init before existing code:
-if self.val_reconstruction_evaluators is None:
-    self.val_reconstruction_evaluators = { ... }
-if self.test_reconstruction_evaluators is None:
-    self.test_reconstruction_evaluators = { ... }
-```
+CPU model initialization verifies imports and checkpoint compatibility; it does
+not qualify generation speed or CUDA execution. Use the intended GPU for the
+actual generation qualification.
 
 ## Notes
 
 - Set `ADIT_REPO_DIR` to an explicit checkout path, or use the sibling `adit` discovery convention.
-- First run downloads ~1-2 GB of model checkpoints from HuggingFace
+- First run downloads ~3 GB of model checkpoints from HuggingFace
 - ADiT supports **dataset-type** (crystals vs molecules) and **spacegroup** conditioning only — no composition or property conditioning
