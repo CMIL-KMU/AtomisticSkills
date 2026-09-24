@@ -50,3 +50,12 @@ observations; only a consuming workflow can accept them into its DB contract.
 
 Legacy hash-bound `anvil.uma-foundation/v1` model descriptors remain readable without
 an Anvil dependency. New descriptors may use `peregrine.uma-foundation/v1`.
+
+## Qualification
+
+`tests/simulations` checks XML observations and restricted foundation loading.
+For the real standalone CLI test, set `ATOMISTIC_PEREGRINE_FIXTURE` to a directory
+containing an engine-created `registry/` and `fixture.json` with `model`, ordered
+`structures`, and reference `expected` energy/force/stress rows. The test blocks all
+Anvil/mkite imports and compares real provider calculations to those reference rows.
+Keep test output under `.agents/test` using pytest's `--basetemp` option.
