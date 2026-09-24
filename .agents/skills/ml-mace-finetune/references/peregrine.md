@@ -40,7 +40,8 @@ GPa stress (six independent components). These are absolute energy errors withou
 an offset fitted on test labels. Improvement is not guaranteed. `predictions.json`
 preserves targets and before/after predictions. The selected model is exported as
 `finetuned.model` and `weights.npz`; the native export is reloaded to check E/F/stress
-agreement. Input/output hashes, installed provider source hashes, package versions,
+agreement (absolute float32 tolerances: 0.001 eV energy, 0.0001 eV/Å forces,
+and 0.000001 eV/Å³ stress, recorded in `export-validation.json`). Input/output hashes, installed provider source hashes, package versions,
 training configuration and CSV history are retained. Retain the full output folder
 for provenance. A small correlated dataset only verifies this workflow, not
 transferability or response outside its sampled structures and strains.
