@@ -11,6 +11,8 @@ dependencies:
     - numpy
     - pymatgen
     - ase
+    - Jinja2
+    - PyYAML
     - mp-api
     - typing-extensions
     - h5py

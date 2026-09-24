@@ -1,7 +1,7 @@
 # Source command line tools
 
 `run_analysis.py` dispatches supplied-data operations to existing scientific
-functions. It has no Anvil dependency; `--help` lists its interface.
+functions. It accepts scientific data without a consumer-service dependency; `--help` lists its interface.
 
 `provision_environments.py` reads every environment's `core_env.yaml` (or
 `env.yaml`) and installs into new explicit prefixes. Run with Python containing
@@ -28,8 +28,7 @@ outputs. MCP servers use the official Python SDK 2.2 or newer (`mcp>=2.2,<3`).
 They use `MCPServer` and the public stdio runner, whose descriptor isolation
 protects the protocol from Python/native tool output. Calls are serialized per
 server because scientific model wrappers and research directories share state.
-The Anvil-independent
-source does not require the separate `fastmcp` distribution. Historical
+The source does not require the separate `fastmcp` distribution. Historical
 `example_full_env.yaml` snapshots may contain SDK 1.x and must not be used with
 current servers without updating MCP.
 Generated MCP configuration sets `PYTHONNOUSERSITE=1` so unrelated packages in the

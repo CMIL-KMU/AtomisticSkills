@@ -50,47 +50,28 @@ class VASPParser:
             raise FileNotFoundError(f"vasprun.xml not found in {self.output_dir}")
 
         # Use pymatgen's Vasprun class
-        vasprun = Vasprun(str(self.vasprun_path))
+        vasprun = Vasprun(str(self.vasprun_path), parse_potcar_file=False)
+        from src.utils.dft.vasp_results import ionic_observables, UNITS
+        observations = ionic_observables(vasprun)
 
         # Extract basic information
         results = {
             "final_structure": vasprun.final_structure,
-            "final_energy": vasprun.final_energy,
+            "final_energy": observations[-1]["energy"],
+            "units": dict(UNITS),
+            "observations": observations,
             "is_completed": vasprun.converged_electronic,
             "is_ionic_converged": vasprun.converged_ionic,
             "calculation_type": self._get_calculation_type(vasprun),
             "incar": dict(vasprun.incar),
             "kpoints": vasprun.kpoints,
-            "potcar": vasprun.potcar,
+            "potcar": vasprun.potcar_symbols,
         }
 
-        # Extract forces if available
-        if hasattr(vasprun, "forces") and vasprun.forces is not None:
-            results["forces"] = vasprun.forces[-1]  # Final forces
-        else:
-            results["forces"] = None
-
-        # Extract stress if available
-        if hasattr(vasprun, "stress") and vasprun.stress is not None:
-            # VASP stress is in kB. Convert to eV/A^3 (ASE standard).
-            # 1 kB = 0.1 GPa. 1 GPa = ase.units.GPa eV/A^3.
-            import ase.units
-
-            results["stress"] = (
-                np.array(vasprun.stress[-1]) * 0.1 * ase.units.GPa
-            ).tolist()
-        else:
-            results["stress"] = None
-
-        # Extract ionic steps if available
-        if hasattr(vasprun, "ionic_steps"):
-            results["ionic_steps"] = len(vasprun.ionic_steps)
-            results["energy_history"] = [
-                step["e_wo_entrp"] for step in vasprun.ionic_steps
-            ]
-        else:
-            results["ionic_steps"] = 0
-            results["energy_history"] = []
+        results["forces"] = observations[-1]["forces"]
+        results["stress"] = observations[-1]["stress"]
+        results["ionic_steps"] = len(observations)
+        results["energy_history"] = [step["energy"] for step in observations]
 
         # Extract electronic convergence
         if hasattr(vasprun, "electronic_steps"):
@@ -118,21 +99,13 @@ class VASPParser:
         outcar = Outcar(str(self.outcar_path))
 
         results = {
-            "magnetization": outcar.magnetization,
-            "total_magnetization": outcar.total_magnetization,
-            "run_stats": outcar.run_stats,
-            "elastic_modulus": outcar.elastic_modulus,
-            "piezoelectric_tensor": outcar.piezoelectric_tensor,
-            "born_charges": outcar.born_charges,
+            "magnetization": getattr(outcar, "magnetization", None),
+            "total_magnetization": getattr(outcar, "total_magnetization", None),
+            "run_stats": getattr(outcar, "run_stats", None),
+            "elastic_modulus": getattr(outcar, "elastic_modulus", None),
+            "piezoelectric_tensor": getattr(outcar, "piezoelectric_tensor", None),
+            "born_charges": getattr(outcar, "born_charges", None),
         }
-
-        # Extract forces from OUTCAR if not available in vasprun
-        if hasattr(outcar, "forces") and outcar.forces:
-            results["forces"] = outcar.forces[-1]
-
-        # Extract stress from OUTCAR if not available in vasprun
-        if hasattr(outcar, "stress") and outcar.stress:
-            results["stress"] = outcar.stress[-1]
 
         logger.info("Successfully parsed OUTCAR")
         return results
@@ -147,11 +120,8 @@ class VASPParser:
         all_results = []
 
         # Check if this is a directory with multiple structure subdirectories
-        structure_dirs = [
-            d
-            for d in self.output_dir.iterdir()
-            if d.is_dir() and d.name.startswith("structure_")
-        ]
+        structure_dirs = sorted({p.parent for p in self.output_dir.rglob("vasprun.xml")
+                                 if p.parent != self.output_dir}) if not self.vasprun_path.exists() else []
 
         if structure_dirs:
             # Multiple structures - parse each one
@@ -167,7 +137,7 @@ class VASPParser:
                         logger.warning(f"No VASP results found in {struct_dir}")
                         continue
 
-                    result["structure_id"] = struct_dir.name
+                    result["structure_id"] = str(struct_dir.relative_to(self.output_dir))
                     all_results.append(result)
                 except Exception as e:
                     logger.warning(f"Failed to parse {struct_dir}: {e}")
@@ -232,7 +202,7 @@ class VASPParser:
         # Create training data entry
         data_entry = {
             "structure": atoms,
-            "energy": float(results.get("final_energy", 0.0)),
+            "energy": float(results["final_energy"]),
             "forces": forces,
             "stress": stress,
             "metadata": {
@@ -247,23 +217,14 @@ class VASPParser:
 
         training_data.append(data_entry)
 
-        # Add intermediate steps if available (only for VASP with history)
-        if "energy_history" in results and len(results["energy_history"]) > 1:
-            # Add intermediate structures (simplified)
-            for i, energy in enumerate(results["energy_history"][:-1]):
-                intermediate_data = {
-                    "structure": atoms,  # Simplified - would need actual intermediate structures
-                    "energy": float(energy),
-                    "forces": None,
-                    "stress": None,
-                    "metadata": {
-                        "calculation_type": "intermediate",
-                        "step": i,
-                        "is_converged": False,
-                        "source": results.get("source", "vasp"),
-                    },
-                }
-                training_data.append(intermediate_data)
+        # Each intermediate label belongs to its own ionic geometry.
+        for i, step in enumerate(results.get("observations", [])[:-1]):
+            training_data.append(dict(
+                structure=AseAtomsAdaptor.get_atoms(Structure.from_dict(step["structure"])),
+                energy=float(step["energy"]), forces=np.asarray(step["forces"]),
+                stress=np.asarray(step["stress"]),
+                metadata=dict(calculation_type="intermediate", step=i, is_converged=False,
+                              source=results.get("source", "vasp"))))
 
         logger.info(
             f"Converted 1 structure to MatGL format (energy: {data_entry['energy']:.6f} eV)"

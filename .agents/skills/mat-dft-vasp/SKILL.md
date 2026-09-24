@@ -50,6 +50,20 @@ python .agents/skills/mat-dft-vasp/scripts/parse_vasp_results.py \
 - **Parsing Robustness**: The parser requires at a minimum `vasprun.xml` to succeed. `OUTCAR` is read supplementary.
 - **POTCARs**: Note that `prepare_vasp_inputs.py` relies on `pymatgen` to write POTCAR files, which requires your `PMG_DEFAULT_FUNCTIONAL` or `.pmgrc.yaml` to point to a valid POTCAR directory.
 
+## Reusable input and output helpers
+
+The local scripts support `omat`, `mp`, `matpes-pbe` and `matpes-r2scan` for
+static or relaxation inputs without atomate2. `omat` retains this repository's
+MPStaticSet + ALGO=Normal settings; it is not an external dataset equivalence claim.
+MatPES uses KSPACING and may produce no KPOINTS file. Batch output preserves the
+relative input filename including its suffix; existing nonempty outputs are refused.
+
+External runners may reuse `src.utils.dft.vasp_writer.create_vasp_input_set` to
+inspect inputs without writing POTCAR. `src.utils.dft.vasp_results.parse_stage`
+provides strict complete-stage extraction. Both parsers preserve each ionic
+geometry, e_wo_entrp energy, forces and tensile-positive stress in eV/angstrom³.
+The existing atomate2 MCP tools remain available for callers choosing that runner.
+
 ## References
 - Kresse, G. & Furthmüller, J., "Efficient iterative schemes for ab initio total-energy calculations using a plane-wave basis set". *Physical Review B*, 54, 11169. [DOI](https://doi.org/10.1103/PhysRevB.54.11169)
 
