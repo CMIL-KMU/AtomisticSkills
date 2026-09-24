@@ -50,6 +50,14 @@ python .agents/skills/mat-dft-vasp/scripts/parse_vasp_results.py \
 - **Parsing Robustness**: The parser requires at a minimum `vasprun.xml` to succeed. `OUTCAR` is read supplementary.
 - **POTCARs**: Note that `prepare_vasp_inputs.py` relies on `pymatgen` to write POTCAR files, which requires your `PMG_DEFAULT_FUNCTIONAL` or `.pmgrc.yaml` to point to a valid POTCAR directory.
 
+## Explicit reusable protocols
+
+For reproducible multistage protocols, dynamics or external workflow execution, use
+[the independent simulation CLI](../../../src/simulations/README.md). It reads an
+explicit protocol directory, writes inputs with caller-supplied PAW paths and parses
+outputs through the same numerical extractor as the standalone parser. Choose
+ambiguity resolutions and physical controls explicitly. Scheduling remains external.
+
 ## References
 - Kresse, G. & Furthmüller, J., "Efficient iterative schemes for ab initio total-energy calculations using a plane-wave basis set". *Physical Review B*, 54, 11169. [DOI](https://doi.org/10.1103/PhysRevB.54.11169)
 
