@@ -14,7 +14,7 @@ dependencies:
   - pip
   - pip:
     - numpy>=1.26.4,<2
-    - mcp>=1.12,<2
+    - mcp>=2.2,<3
     - mdanalysis
     - prolif
     - rdkit

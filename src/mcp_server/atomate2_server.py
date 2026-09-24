@@ -6,7 +6,7 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-from src.utils.mcp_utils import setup_mcp_stdout, run_fastmcp_server
+from src.utils.mcp_utils import setup_mcp_stdout, run_mcp_server
 from src.utils.config_utils import inject_config_into_env
 
 # Setup stdout redirection for MCP
@@ -16,7 +16,7 @@ inject_config_into_env()
 import logging
 import warnings
 import json
-from mcp.server.fastmcp import FastMCP
+from mcp.server import MCPServer
 from typing import Dict, Any, Optional, List
 from pathlib import Path
 
@@ -31,7 +31,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("Atomate2Server")
 
 # Create MCP server
-mcp = FastMCP("atomate2")
+mcp = MCPServer("atomate2")
 
 
 @mcp.tool()
@@ -447,4 +447,4 @@ def get_atomate2_project_status(
 
 
 if __name__ == "__main__":
-    run_fastmcp_server(mcp, mcp_pipe_binary)
+    run_mcp_server(mcp, mcp_pipe_binary)

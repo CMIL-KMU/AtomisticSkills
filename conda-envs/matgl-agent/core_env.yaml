@@ -3,7 +3,7 @@ dependencies:
   - python=3.12
   - pip
   - pip:
-    - mcp>=1.12,<2
+    - mcp>=2.2,<3
     - matgl
     - cython
     - pymatgen

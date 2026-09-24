@@ -6,7 +6,7 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-from src.utils.mcp_utils import setup_mcp_stdout, run_fastmcp_server
+from src.utils.mcp_utils import setup_mcp_stdout, run_mcp_server
 
 # Setup stdout redirection for MCP
 mcp_pipe_binary = setup_mcp_stdout()
@@ -14,7 +14,7 @@ mcp_pipe_binary = setup_mcp_stdout()
 import logging
 import warnings
 from pathlib import Path
-from mcp.server.fastmcp import FastMCP
+from mcp.server import MCPServer
 from typing import Dict, Any, Optional, List, Union
 import numpy as np
 
@@ -25,8 +25,8 @@ warnings.filterwarnings("ignore")
 logging.basicConfig(level=logging.INFO, stream=sys.stderr)
 logger = logging.getLogger("Smol-Server")
 
-# Initialize FastMCP server
-mcp = FastMCP("Smol")
+# Initialize MCP server
+mcp = MCPServer("Smol")
 from src.utils.disordered_material.smol_utils import SmolWrapper
 from src.utils.research_utils import get_current_research_dir
 
@@ -367,4 +367,4 @@ def check_mapping(
 
 
 if __name__ == "__main__":
-    run_fastmcp_server(mcp, mcp_pipe_binary)
+    run_mcp_server(mcp, mcp_pipe_binary)

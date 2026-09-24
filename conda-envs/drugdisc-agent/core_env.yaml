@@ -8,7 +8,7 @@ dependencies:
   - fpocket
   - pip
   - pip:
-    - mcp>=1.12,<2
+    - mcp>=2.2,<3
     - rdkit
     - meeko
     - scipy

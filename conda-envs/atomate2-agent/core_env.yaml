@@ -4,7 +4,7 @@ dependencies:
   - pip
   - cmake>=3.25
   - pip:
-    - mcp>=1.12,<2
+    - mcp>=2.2,<3
     - atomate2
     - pymatgen
     - typing-extensions

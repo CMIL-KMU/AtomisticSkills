@@ -24,8 +24,14 @@ environment README for extra provider checkouts, extension wheels, checkpoints,
 licensed binaries and device requirements. Record those steps and run actual
 tool tests before advertising a skill as executable. `pip check` alone cannot
 validate CUDA drivers, model compatibility, external services or scientific
-outputs. MCP servers currently import the MCP 1.x SDK; the declarations bound
-that major version to prevent the incompatible 2.x module layout.
+outputs. MCP servers use the official Python SDK 2.2 or newer (`mcp>=2.2,<3`).
+They use `MCPServer` and the public stdio runner, whose descriptor isolation
+protects the protocol from Python/native tool output. Calls are serialized per
+server because scientific model wrappers and research directories share state.
+The Anvil-independent
+source does not require the separate `fastmcp` distribution. Historical
+`example_full_env.yaml` snapshots may contain SDK 1.x and must not be used with
+current servers without updating MCP.
 Generated MCP configuration sets `PYTHONNOUSERSITE=1` so unrelated packages in the
 user's home directory cannot override the chosen Conda environment. For manual
 script calls set the same variable. External provider paths use `ADIT_REPO_DIR`,

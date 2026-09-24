@@ -1,8 +1,6 @@
 import sys
 import os
-import contextlib
 import anyio
-from mcp.server.stdio import stdio_server
 
 
 def setup_mcp_stdout():
@@ -52,46 +50,33 @@ def setup_mcp_stdout():
         return None
 
 
-@contextlib.asynccontextmanager
-async def mcp_transport_manager(mcp_pipe_binary):
-    """
-    Async context manager to provide explicit transport streams to stdio_server,
-    bypassing sys.stdout and sys.stdin.
+def run_mcp_server(mcp, mcp_pipe_binary):
+    """Hand the saved wire to SDK 2.2's public stdio runner.
+
+    Imports run with both Python and native stdout redirected to stderr. Once
+    startup is complete, the SDK claims fd 1 itself and isolates tool/child
+    output for the lifetime of its transport. No private server API is used.
     """
     if mcp_pipe_binary is None:
-        # Fallback to default behavior if redirection failed
-        async with stdio_server() as streams:
-            yield streams
-        return
+        raise RuntimeError("MCP stdout isolation failed; refusing an unsafe transport")
+    tool_lock = anyio.Lock()
 
-    # Create explicit async streams for the transport
-    # Stdio server expects AsyncFile[str] (wrapped TextIOWrapper)
-    from io import TextIOWrapper
+    async def serialize_tools(context, call_next):
+        # SDK 2 runs synchronous tools in threads. Model wrappers and the active
+        # research directory are process-wide state: retain serial tool calls.
+        if context.method == "tools/call":
+            async with tool_lock:
+                return await call_next(context)
+        return await call_next(context)
 
-    # Wrap original stdin and our saved pipe binary
-    # We use buffering=1 (line buffering) for text streams
-    async_stdin = anyio.wrap_file(
-        TextIOWrapper(sys.stdin.buffer, encoding="utf-8", line_buffering=True)
-    )
-    async_stdout = anyio.wrap_file(
-        TextIOWrapper(mcp_pipe_binary, encoding="utf-8", line_buffering=True)
-    )
-
-    async with stdio_server(stdin=async_stdin, stdout=async_stdout) as streams:
-        yield streams
-
-
-def run_fastmcp_server(mcp, mcp_pipe_binary):
-    """
-    Run a FastMCP server using the robust redirection transport.
-    """
-
-    async def _run():
-        async with mcp_transport_manager(mcp_pipe_binary) as (
-            read_stream,
-            write_stream,
-        ):
-            init_options = mcp._mcp_server.create_initialization_options()
-            await mcp._mcp_server.run(read_stream, write_stream, init_options)
-
-    anyio.run(_run)
+    mcp.middleware.append(serialize_tools)
+    sys.stdout.flush()
+    previous_stdout = sys.stdout
+    os.dup2(mcp_pipe_binary.fileno(), 1)
+    sys.stdout = sys.__stdout__
+    try:
+        mcp.run(transport="stdio")
+    finally:
+        os.dup2(2, 1)
+        sys.stdout = previous_stdout
+        mcp_pipe_binary.close()

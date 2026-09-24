@@ -35,7 +35,7 @@ pip install e3nn==0.5.1 einops rootutils rich omegaconf torchdiffeq huggingface_
 pip install pymatgen ase rdkit pyxtal tqdm scipy pandas matplotlib torchmetrics
 pip install timm lmdb wandb pathos p-tqdm download
 pip install smact matminer importlib_resources
-pip install mcp fastmcp
+pip install 'mcp>=2.2,<3'
 ```
 
 5. Clone the AADT repository:
