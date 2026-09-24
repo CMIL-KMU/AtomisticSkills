@@ -19,6 +19,15 @@ To evaluate and improve the accuracy of a foundation MACE potential for a specif
 19. **Validation**: Verify convergence and compare against the benchmarked foundation metrics.
 20. **Registration**: Use the `register_model` tool to register the newly fine-tuned model checkpoint into the local registry so future research tasks can discover and reuse it.
 
+## Peregrine execution
+
+For an existing Peregrine MACE environment, use the standalone
+[`peregrine_finetune.py`](scripts/peregrine_finetune.py) entry point. It preserves
+explicit train/validation/test assignments, trains energy/forces/stress through
+Peregrine, selects the best validation checkpoint, and reports before/after metrics.
+See [input contract and usage](references/peregrine.md). No database or agent
+runtime is required.
+
 ## Training Configuration
 
 MACE fine-tuning is divided into a data preparation step, a configuration generation step, and a standard native training run. The script `scripts/prepare_mace_data.py` generates `.xyz` files, and `scripts/generate_mace_config.py` converts arguments into a fully-formed `finetune_config.yaml` configuration compatible with the MACE default parser.
@@ -31,7 +40,7 @@ MACE fine-tuning is divided into a data preparation step, a configuration genera
 | `--output-dir` | str | `./fine_tuning_data` | Directory to save the converted .xyz data |
 | `--val-split` | float | 0.1 | Fraction of data to set aside for validation |
 | `--seed` | int | 42 | Random seed for validation splitting |
-| `--vasp-stress-conversion`| flag | - | If set, multiplies stress values by -1/160.2x to convert VASP raw kB to eV/Å³ |
+| `--vasp-stress-conversion`| flag | - | If set, multiplies stress values by -1/1602.1766208 to convert VASP raw kB to eV/Å³ |
 
 ### Basic Arguments (Configuration Generation Script)
 
@@ -107,7 +116,7 @@ MACE fine-tuning is divided into a data preparation step, a configuration genera
 | `compute_stress` | bool | False | `True`, `False` | Include stress in training (auto-enabled by data script). |
 
 > [!WARNING]
-> **Stress Units**: MACE expects stress in `eV/Å³`. Raw VASP stress obtained directly via some JSON files may be in kilo-Bar (`kB`), which is ~160x larger and will cause catastrophic training divergence. The Atomate2 MCP tool handles this conversion automatically when `convert_units=True`. However, if your JSON labels contain raw `kB` stress, you MUST pass the `--vasp-stress-conversion` flag to `scripts/prepare_mace_data.py` to automatically scale them by `-1/160.2x`. For more details on unit standardization, see @[.agents/skills/general-property-units/SKILL.md].
+> **Stress Units**: MACE expects stress in `eV/Å³`. Raw VASP stress obtained directly via some JSON files may be in kilo-Bar (`kB`), which uses a different scale and sign convention. The Atomate2 MCP tool handles this conversion automatically when `convert_units=True`. However, if your JSON labels contain raw `kB` stress, you MUST pass the `--vasp-stress-conversion` flag to `scripts/prepare_mace_data.py` to automatically scale them by `-1/1602.1766208`. For more details on unit standardization, see @[.agents/skills/general-property-units/SKILL.md].
 
 > [!WARNING]
 > **Learning rate sensitivity for MACE-OMAT**: The official MACE docs recommend `lr=0.01` for MACE-MP-0, but MACE-OMAT-0-small requires `lr=1e-4` to avoid divergence. Higher values (1e-3, 0.01) cause catastrophic forgetting even with frozen backbone + EMA.
