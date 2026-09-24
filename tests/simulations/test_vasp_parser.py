@@ -97,6 +97,13 @@ def test_optional_spectral_objects_and_runtime_controls(tmp_path, monkeypatch):
     assert report['outcar_parameters']['IRC_STOP'] == 3
     assert report['outcar_parameters']['IRC_DELTA0'] == .0015
     assert 'IRC_STOP' not in report['incar']
+    with (tmp_path / 'OUTCAR').open('a') as out:
+        out.write('\n VTST: version 4.2, (08/11/21)\n CHAIN: Read ICHAIN 2\n'
+                  ' OPT: Using Conjugate-Gradient optimizer\n Dimer: RotMax 6\n'
+                  ' Dimer: dR 0.005000\n Dimer: FNMax 1.000000\n Dimer: FNMin 0.010000\n')
+    report = vasp_results.parse_stage(tmp_path)
+    assert report['extensions'] == {'vtst': '4.2'}
+    assert {k: report['outcar_parameters'][k] for k in ('ICHAIN', 'IOPT', 'DDR', 'DROTMAX')} == {'ICHAIN':2., 'IOPT':2, 'DDR':.005, 'DROTMAX':6.}
 
 
 def test_fixed_charge_cannot_become_training_labels(tmp_path):

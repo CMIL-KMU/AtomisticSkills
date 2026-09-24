@@ -1,4 +1,9 @@
-"""VASP numerical extraction with explicit energy and stress conventions."""
+"""VASP observations with explicit conventions and absent optional quantities.
+
+Full stress is required only for ISIF >= 2; trace-only ISIF=1 is not a tensor.
+Spectral objects are optional unless a consuming calculation requests them.
+Runtime extension parameters retain their OUTCAR origin separately from XML.
+"""
 
 from pathlib import Path
 import json
@@ -83,8 +88,12 @@ def parse_stage(directory):
         potcar_titles=v.potcar_symbols,
         run_stats=outcar.run_stats,
     )
+    result["converged"] = result["converged"] and result["electronic_converged"]
     text = (Path(directory) / "OUTCAR").read_text()
     controls = {}
+    vtst = re.search(r"^\s*VTST: version\s+([\d.]+)", text, re.MULTILINE)
+    if vtst:
+        result["extensions"] = {"vtst": vtst[1]}
     if v.parameters.get("IBRION", v.incar.get("IBRION")) == 40:
         # XML omits these in VASP 6.4.1. Read the engine's runtime block,
         # never the echoed user INCAR at the beginning of OUTCAR.
