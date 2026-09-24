@@ -10,6 +10,17 @@ AtomisticSkills can be used independently through its skills, scripts and MCP
 tools. No Anvil installation or `atomistic-analysis` package is required. Shared
 scientific helpers live in `src/utils/analysis`; external automation may use the
 optional `tools/run_analysis.py` JSON CLI. See [consumer boundaries](docs/anvil-integration.md).
+
+This public repository owns reusable scientific skills, scripts, MCP tools and
+algorithms, including generic VASP/Peregrine preparation and analysis. Unpublished
+methods and laboratory protocol catalogs belong in a separate private extension
+repository, `atomistic-toolkit`, which reuses a pinned public revision. Anvil is an
+optional consumer for durable requests, workflows, Campaigns and database storage;
+anvil-recipes adapts tool execution/results, anvil-machine owns site/scheduler
+configuration, and an external harness makes research decisions. Public tools
+never require these consumers or call back into their databases. Discover this
+repository's skills only through `.agents/skills/`.
+
 **AtomisticSkills** is a composable framework for AI-driven atomistic materials research. Built on the **hierarchical decomposition** of complex scientific tasks into **Workflows** → **Skills** → **Tools**, it enables coding AI agents to autonomously conduct multi-stage materials, chemistry, and drug discovery research by combining modular, reusable capabilities.
 
 The framework integrates state-of-the-art Machine Learning Interatomic Potentials (MLIPs), DFT calculations, generative AI, database APIs, and advanced simulation methods through the Model Context Protocol (MCP) tools and Skills, making advanced materials research accessible to AI copilots like [Google Antigravity](https://antigravity.google), [Cursor](https://www.cursor.com/), [Claude Code](https://code.claude.com/docs/en/overview), and [OpenAI Codex](https://openai.com/codex/).

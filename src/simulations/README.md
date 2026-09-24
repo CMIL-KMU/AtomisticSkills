@@ -30,7 +30,11 @@ agent. GPU execution requires engine hardware qualification in the selected envi
   and `stage` for dynamics-aware parsing (see `vasp/dynamics.py`).
 - `identity`: `{ "provider": "vasp" }` records implementation hashes/dependencies.
 
-Protocol catalogs remain caller-supplied until redistribution rights are established.
+Protocol catalogs remain caller-supplied. Internal laboratory catalogs are owned
+by the separate private atomistic-toolkit extension; this public repository stays
+independent and contains no restricted catalog payload. Generic science fixes
+belong here; private methods and data belong in the extension. Consumers reuse
+these scripts and adapt their output into their own execution/storage contracts.
 No licensed PAW datasets or VASP binaries are included. Existing profile aliases are
 accepted for saved-input compatibility. The standalone DFT parser and this interface
 share `ionic_steps.e_wo_entrp` energies and tensile-positive stress in eV/angstrom^3.
