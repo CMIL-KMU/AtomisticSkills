@@ -69,7 +69,7 @@ class VASPParser:
         }
 
         results["forces"] = observations[-1]["forces"]
-        results["stress"] = observations[-1]["stress"]
+        results["stress"] = observations[-1].get("stress")
         results["ionic_steps"] = len(observations)
         results["energy_history"] = [step["energy"] for step in observations]
 
@@ -174,6 +174,8 @@ class VASPParser:
             List of training data in MatGL format (typically one entry per structure).
         """
         training_data = []
+        if results.get("incar", {}).get("ICHARG", 0) >= 10:
+            raise ValueError("Fixed-charge spectra are not self-consistent E/F training labels")
 
         # Convert pymatgen Structure to ASE Atoms
         structure = results.get("final_structure")
@@ -222,7 +224,7 @@ class VASPParser:
             training_data.append(dict(
                 structure=AseAtomsAdaptor.get_atoms(Structure.from_dict(step["structure"])),
                 energy=float(step["energy"]), forces=np.asarray(step["forces"]),
-                stress=np.asarray(step["stress"]),
+                stress=np.asarray(step["stress"]) if "stress" in step else None,
                 metadata=dict(calculation_type="intermediate", step=i, is_converged=False,
                               source=results.get("source", "vasp"))))
 
