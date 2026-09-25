@@ -109,7 +109,7 @@ def parse_relax_subdir(subdir: Path) -> Optional[Dict]:
     return {"energy": energy, "n_atoms": n_atoms, "a": a, "b": b}
 
 
-from atomistic_analysis.scalars import compute_gb_energy
+from src.utils.analysis.scalars import compute_gb_energy
 
 
 def load_metadata(relaxation_dir: Path) -> Optional[Dict]:

@@ -26,7 +26,7 @@ For detailed installation instructions, please refer to the `README.md` and `ins
 - **orca-agent**: `conda-envs/orca-agent/` (Core: scine_utilities, scine_readuct, ase). Requires `ORCA_BINARY_PATH` environment variable pointing to the ORCA binary. No MCP server, scripts only.
 - **phasefield-agent**: `conda-envs/phasefield-agent/` (Core: fipy, scipy, numpy, imageio). No MCP server, scripts only.
 - **calphad-agent**: `conda-envs/calphad-agent/` (Core: pycalphad, pymatgen). No MCP server, scripts only.
-- **nmr-agent**: `conda-envs/nmr-agent/` (Core: nmrsim, nmrglue, pot). No MCP server, scripts only.
+- **nmr-agent**: `conda-envs/nmr-agent/` (Core: nmrsim, scipy, RDKit; current deconvolution uses scipy.optimize). No MCP server, scripts only.
 - **react-ot-agent**: `conda-envs/react-ot-agent/` (Core: PyTorch). No MCP server, scripts only.
 
 | MCP Server | Conda Environment | Python Path |

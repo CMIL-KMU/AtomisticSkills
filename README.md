@@ -1,7 +1,3 @@
-> **Laboratory fork:** scientific protocols and tools are reused through Anvil
-> Campaigns. See [integration boundaries](docs/anvil-integration.md) and the
-> [installable analysis API](atomistic_analysis/README.md).
-
 # AtomisticSkills
 
 ![AtomisticSkills Logo](site/logo/atomisticskills_logo.svg)
@@ -9,6 +5,13 @@
 [![arXiv](https://img.shields.io/badge/arXiv-2605.24002-b31b1b.svg)](https://arxiv.org/abs/2605.24002)
 
 ## Overview
+
+Use AtomisticSkills directly through `.agents/skills/`, existing scripts and MCP
+tools. Scientific helpers remain source utilities; no project distribution is
+required. External agents can invoke the optional JSON tools described in
+[external tools](docs/external-tools.md). Planning, execution state and storage
+belong to the caller; scientific tools do not call back into a consumer service.
+
 **AtomisticSkills** is a composable framework for AI-driven atomistic materials research. Built on the **hierarchical decomposition** of complex scientific tasks into **Workflows** → **Skills** → **Tools**, it enables coding AI agents to autonomously conduct multi-stage materials, chemistry, and drug discovery research by combining modular, reusable capabilities.
 
 The framework integrates state-of-the-art Machine Learning Interatomic Potentials (MLIPs), DFT calculations, generative AI, database APIs, and advanced simulation methods through the Model Context Protocol (MCP) tools and Skills, making advanced materials research accessible to AI copilots like [Google Antigravity](https://antigravity.google), [Cursor](https://www.cursor.com/), [Claude Code](https://code.claude.com/docs/en/overview), and [OpenAI Codex](https://openai.com/codex/).
@@ -166,7 +169,7 @@ This project is optimized for use with coding AI copilots like **[Antigravity](h
 ### The `.agents/` Directory
 - **Rules (`.agents/rules/`)**: Contains project-specific standards, scientific constraints, and modeling guidelines. Coding agents automatically parse these to ensure all simulations and code follow best practices.
 - **Skills (`.agents/skills/`)**: Modular, reusable capabilities, typically at the scale of a single research task (e.g., calculate material's stability). Each skill is self-documented with instructions, scripts, and resources.
-- **Workflows (`.agents/workflows/`)**: Defines high level research procedures (e.g., workflow to design a new material). In this fork they guide Anvil Campaign construction; recipes and machine manage execution.
+- **Workflows (`.agents/workflows/`)**: Defines high level research procedures (e.g., workflow to design a new material). Coding agents can execute these step-by-step, managing the complex transitions between different conda environments and simulation stages.
 
 ---
 

@@ -9,7 +9,7 @@ import pytest
 def test_diffusion_cli_and_no_overwrite(tmp_path, monkeypatch):
     from ase import Atoms
     from ase.io import write
-    from atomistic_analysis.cli import diffusion_main
+    from src.utils.analysis.cli import diffusion_main
 
     path = tmp_path / "source.xyz"
     frames = [
@@ -57,7 +57,7 @@ def test_diffusion_cli_and_no_overwrite(tmp_path, monkeypatch):
 
 
 def test_arrhenius_cli_uses_explicit_observations(tmp_path, monkeypatch):
-    from atomistic_analysis.cli import arrhenius_main
+    from src.utils.analysis.cli import arrhenius_main
 
     path = tmp_path / "observations.json"
     out = tmp_path / "fit"

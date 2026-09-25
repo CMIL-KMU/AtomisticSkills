@@ -2,12 +2,6 @@
 description: End-to-end workflow for extracting reaction kinetics (mole fraction vs time) from time-series crude 1H NMR spectra via Wasserstein deconvolution.
 ---
 
-> Laboratory fork: this document supplies scientific methodology for Anvil Campaigns.
-> Anvil owns approvals, iteration state and provenance; anvil-machine owns submission.
-> Any upstream local tracking/submission examples below are reference material,
-> not instructions to create a parallel execution path.
-
-
 # NMR Time-Series Reaction Kinetics
 
 This workflow extends the single-point NMR quantification workflow (`reaction-to-nmr-quantification.md`) to a time series: given crude 1H NMR spectra recorded at multiple time points during a reaction, it produces mole-fraction-vs-time kinetics curves.

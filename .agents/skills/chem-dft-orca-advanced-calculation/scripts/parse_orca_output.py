@@ -32,7 +32,7 @@ logger = logging.getLogger("ORCA-Parser")
 HARTREE_TO_EV = 27.211386245988
 
 
-from atomistic_analysis.orca import parse_energy
+from src.utils.analysis.orca import parse_energy
 
 
 def parse_orbital_energies(content: str) -> dict:

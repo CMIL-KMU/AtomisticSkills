@@ -7,7 +7,7 @@ import pytest
 pytest.importorskip("pymatgen.analysis.diffusion.analyzer")
 from ase import Atoms
 from ase.io import write
-from atomistic_analysis.transport import analyze
+from src.utils.analysis.transport import analyze
 
 
 def trajectory(tmp_path, moving=True):
@@ -132,7 +132,7 @@ def test_negative_raw_slope_is_not_positive_floor(tmp_path):
 
 def test_changed_cell_and_invalid_configuration_fail(tmp_path):
     from ase.io import read
-    from atomistic_analysis.transport import configuration
+    from src.utils.analysis.transport import configuration
 
     for change in [
         dict(smoothed=True),

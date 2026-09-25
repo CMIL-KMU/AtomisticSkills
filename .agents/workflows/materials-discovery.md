@@ -2,20 +2,14 @@
 description: An end-to-end workflow for high-throughput materials discovery, screening, and synthesizability assessment.
 ---
 
-> Laboratory fork: this document supplies scientific methodology for Anvil Campaigns.
-> Anvil owns approvals, iteration state and provenance; anvil-machine owns submission.
-> Any upstream local tracking/submission examples below are reference material,
-> not instructions to create a parallel execution path.
-
-
 # Materials Discovery Workflow
 
 This workflow provides a generalized, hierarchical approach to discovering new materials. It covers starting from initial candidate generation to evaluating thermodynamic stability, screening target properties, and finally assessing novelty and experimental synthesizability.
 
-## 1. Campaign context
-Use the existing Anvil Project/Campaign and its objective, chemical space,
-constraints and review policy. Scientific steps below guide Campaign construction;
-Job directories are allocated by the execution layer.
+## 1. Initial Research Setup
+Follow the initialization protocol defined in `@.agents/rules/research-standards.md`.
+- **Workspace**: Create a dedicated timestamped directory for the project (e.g., `research/YYYY-MM-DD_project_name`).
+- **Objective**: Clearly define the target application, chemical space, and the critical properties needed for success (e.g., high ionic conductivity, appropriate bandgap, or strong magnetic moment).
 
 ## 2. Candidate Generation
 Generate or retrieve a diverse set of initial candidate structures. Select the approach based on whether you are exploring known chemical spaces or searching for entirely novel frameworks.
@@ -33,10 +27,11 @@ Generate or retrieve a diverse set of initial candidate structures. Select the a
   - *Skill Reference*: `mat-random-structure-search` (AIRSS-style generation for specific compositions)
   - *Skill Reference*: `mat-disorder` (Generate ordered supercells from disordered structures)
 
-## 3. Candidate documentation and tracking
-Register candidate identity, formula, source and scientific observations through
-Anvil. Campaign iterations connect candidates, Jobs, Results and datasets. CSV
-exports may be used for analysis, but must not become an independent status ledger.
+## 3. Candidate Documentation and Tracking
+Maintain a centralized record of all candidates to track their progress through the screening funnel.
+- Create a primary DataFrame or CSV table in the research directory (e.g., `candidates_tracking.csv`).
+- **Required Columns**: `candidate_id`, `formula`, `source/generation_method`, `space_group`.
+- **Property Columns**: Add columns for downstream calculated metrics (e.g., `e_above_hull`, `bandgap`, `bulk_modulus`) to easily query and filter the best performers later.
 
 ## 4. Stability Determination
 Before investing in expensive property calculations, screen out inherently unstable candidates.
@@ -64,7 +59,7 @@ Evaluate functional properties to find the best candidates for your specific app
 - **Ion Transport**: `mat-diffusion-analysis`, `mat-intercalation-voltage`
 - **Surfaces and Defects**: `mat-surface-energy`, `mat-surface-adsorption`, `mat-defect-energy`
 
-*Publish recipe outputs to Anvil with their source Job and Campaign iteration.*
+*Update the tracking table (from step 3) continuously as properties are calculated.*
 
 ## 6. Structure Novelty Check
 Once the top-performing candidates are identified, confirm that they are genuinely new discoveries.

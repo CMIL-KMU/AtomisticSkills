@@ -9,6 +9,9 @@ dependencies:
   - uv
 
   - pip:
+    - mcp>=2.2,<3
+    - --extra-index-url https://download.pytorch.org/whl/cu118
+    - --find-links https://data.pyg.org/whl/torch-2.2.1+cu118.html
     - mattergen
 
   # CRITICAL: PyG dependencies require manual installation from git source on ARM/aarch64

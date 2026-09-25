@@ -8,7 +8,7 @@ dependencies:
   - "pytorch=*=*cuda*"
   - pip
   - pip:
-    - mcp
+    - mcp>=2.2,<3
     - fairchem-core>=2.18.0
     - cython
     - pymatgen
@@ -19,4 +19,4 @@ dependencies:
     - sella
     - typing-extensions
     - ase>=3.23
-    - "-e /home/bdeng/projects/nvalchemi-toolkit"
+    - "nvalchemi-toolkit"

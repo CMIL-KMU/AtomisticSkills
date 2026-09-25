@@ -29,10 +29,10 @@ import json
 import re
 from collections import defaultdict
 
-from atomistic_analysis.epw import ROW_RE as ROW_RE
+from src.utils.analysis.epw import ROW_RE as ROW_RE
 
 
-from atomistic_analysis.epw import parse_rows as parse_rows
+from src.utils.analysis.epw import parse_rows as parse_rows
 
 
 def summarize(text: str, fermi: float, n_modes: int = 9) -> dict:

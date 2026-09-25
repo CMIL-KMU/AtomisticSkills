@@ -2,12 +2,6 @@
 description: End-to-end high-throughput screening of MOF databases for CO2 direct air capture (DAC), from database query through Widom insertion ranking to GCMC isotherm validation of top candidates.
 ---
 
-> Laboratory fork: this document supplies scientific methodology for Anvil Campaigns.
-> Anvil owns approvals, iteration state and provenance; anvil-machine owns submission.
-> Any upstream local tracking/submission examples below are reference material,
-> not instructions to create a parallel execution path.
-
-
 # MOF CO2 Direct Air Capture (DAC) Screening Workflow
 
 This workflow guides you through a two-stage computational screening pipeline to identify the most promising Metal-Organic Frameworks (MOFs) for CO2 direct air capture from a large structural database.

@@ -3,16 +3,18 @@ channels:
   - conda-forge
 dependencies:
   - python=3.11
+  - numpy>=1.26.4,<2
   - openmm>=8.1
   - pdbfixer
   - parmed
   - pymol-open-source
+  - openff-toolkit
+  - openmmforcefields
+  - openff-interchange
   - pip
   - pip:
-    - mcp
-    - openff-toolkit
-    - openmmforcefields
-    - openff-interchange
+    - numpy>=1.26.4,<2
+    - mcp>=2.2,<3
     - mdanalysis
     - prolif
     - rdkit

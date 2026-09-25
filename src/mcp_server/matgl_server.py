@@ -15,12 +15,12 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-from src.utils.mcp_utils import setup_mcp_stdout, run_fastmcp_server
+from src.utils.mcp_utils import setup_mcp_stdout, run_mcp_server
 
 # Setup stdout redirection for MCP
 mcp_pipe_binary = setup_mcp_stdout()
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server import MCPServer
 from src.utils.serialization_utils import recursive_tolist
 from src.utils.research_utils import get_current_research_dir
 
@@ -31,8 +31,8 @@ warnings.filterwarnings("ignore")
 logging.basicConfig(level=logging.INFO, stream=sys.stderr)
 logger = logging.getLogger("MatGL-Server")
 
-# Initialize FastMCP server
-mcp = FastMCP("MatGL")
+# Initialize MCP server
+mcp = MCPServer("MatGL")
 
 # Global variables to hold state
 wrapper: Optional[Any] = None
@@ -357,4 +357,4 @@ def run_md(
 
 
 if __name__ == "__main__":
-    run_fastmcp_server(mcp, mcp_pipe_binary)
+    run_mcp_server(mcp, mcp_pipe_binary)

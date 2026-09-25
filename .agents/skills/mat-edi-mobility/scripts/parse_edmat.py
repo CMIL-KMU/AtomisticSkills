@@ -45,13 +45,13 @@ import os
 import yaml
 
 
-from atomistic_analysis.edi_matrix import parse_edmat as parse_edmat
+from src.utils.analysis.edi_matrix import parse_edmat as parse_edmat
 
 
-from atomistic_analysis.edi_matrix import _parse_row as _parse_row
+from src.utils.analysis.edi_matrix import _parse_row as _parse_row
 
 
-from atomistic_analysis.edi_matrix import select_band_pair as select_band_pair
+from src.utils.analysis.edi_matrix import select_band_pair as select_band_pair
 
 
 def main() -> None:

@@ -7,7 +7,8 @@ This environment contains DiffCSP++ for space-group-constrained crystal structur
 - Conda/miniforge3 installed
 - Python 3.11
 - CUDA 13.0 compatible GPU (for GPU acceleration)
-- DiffCSP++ repo cloned to `/home/bdeng/projects/DiffCSP-PP`
+- DiffCSP++ repo selected with `DIFFCSP_REPO_DIR` (default: sibling `DiffCSP-PP`)
+- Optional `DIFFCSP_CHECKPOINT_DIR` selects checkpoints outside that checkout.
 
 ## Installation
 
@@ -26,7 +27,7 @@ pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu13
 ```bash
 pip install pymatgen ase pyxtal hydra-core==1.3.2 omegaconf==2.3.0 \
   pytorch-lightning==2.0.3 chemparse p-tqdm python-dotenv smact matminer \
-  einops torchdiffeq scikit-learn wandb torch-geometric mcp
+  einops torchdiffeq scikit-learn wandb torch-geometric 'mcp>=2.2,<3'
 
 # Downgrade setuptools for pkg_resources compatibility
 pip install setuptools==69.5.1 --force-reinstall
@@ -45,7 +46,7 @@ pip install --no-build-isolation --no-cache-dir git+https://github.com/rusty1s/p
 5. Download pre-trained checkpoints:
 ```bash
 pip install gdown
-cd /home/bdeng/projects/DiffCSP-PP
+cd "$DIFFCSP_REPO_DIR"
 gdown --folder https://drive.google.com/drive/folders/1FQ_b6CE09KtyGaU_r6uO8_I5JhrQmUFB --remaining-ok -O checkpoints
 ```
 

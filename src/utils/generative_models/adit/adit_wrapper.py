@@ -78,6 +78,8 @@ class ADiTWrapper:
 
         # Find the AADT repo path
         if adit_repo_path is None:
+            adit_repo_path = os.environ.get("ADIT_REPO_DIR")
+        if adit_repo_path is None:
             # Try common locations
             project_root = os.environ.get("PYTHONPATH", "").split(":")[0]
             # Look for the AADT repo as a sibling of the project root,

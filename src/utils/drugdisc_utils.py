@@ -10,9 +10,9 @@ import logging
 from typing import List, Tuple, Optional
 
 from rdkit import Chem
-from atomistic_analysis.molecules import mol_from_smiles as mol_from_smiles
-from atomistic_analysis.molecules import compute_descriptors as compute_descriptors
-from atomistic_analysis.molecules import compute_fingerprints as compute_fingerprints
+from src.utils.analysis.molecules import mol_from_smiles as mol_from_smiles
+from src.utils.analysis.molecules import compute_descriptors as compute_descriptors
+from src.utils.analysis.molecules import compute_fingerprints as compute_fingerprints
 
 logger = logging.getLogger(__name__)
 

@@ -6,17 +6,18 @@ dependencies:
   - python=3.10
   - cython
   - matplotlib
-  - conda-forge::rdkit
   - conda-forge::python-graphviz
   - conda-forge::pygraphviz
-  - conda-forge::pytorch=2.4.0
   - pip
   - einops
   - seaborn
   - h5py
   - pip:
+    - torch==2.4.0
+    - mpmath<1.4
+    - rdkit==2025.03.*
     - pytorch-lightning
-    - "ray[tune]==2.7.2"
+    - "ray[tune]>=2.49.1"
     - "setuptools<81"
     - ipython
     - pydantic

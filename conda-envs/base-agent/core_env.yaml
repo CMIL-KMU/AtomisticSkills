@@ -7,10 +7,12 @@ dependencies:
   - packmol
   - pip
   - pip:
-    - mcp
+    - mcp>=2.2,<3
     - numpy
     - pymatgen
     - ase
+    - Jinja2
+    - PyYAML
     - mp-api
     - typing-extensions
     - h5py

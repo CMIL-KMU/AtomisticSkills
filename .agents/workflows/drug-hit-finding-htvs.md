@@ -2,12 +2,6 @@
 description: An end-to-end workflow for noncovalent, small-molecule structure-based virtual screening, from target retrieval through docking, pose validation, MD refinement, and ADMET filtering to identify drug-like hits.
 ---
 
-> Laboratory fork: this document supplies scientific methodology for Anvil Campaigns.
-> Anvil owns approvals, iteration state and provenance; anvil-machine owns submission.
-> Any upstream local tracking/submission examples below are reference material,
-> not instructions to create a parallel execution path.
-
-
 # Drug Hit-Finding by High-Throughput Virtual Screening
 
 This workflow chains database retrieval, structure preparation, docking, pose validation, molecular dynamics refinement, trajectory analysis, and ADMET filtering into a progressive funnel. Each stage eliminates compounds, so that expensive refinement is applied only to the most promising candidates.

@@ -20,8 +20,8 @@ from typing import Any, Dict, List, Optional, Union
 logger = logging.getLogger(__name__)
 
 # DiffCSP++ repo location
-DIFFCSP_REPO = Path("/home/bdeng/projects/DiffCSP-PP")
-DIFFCSP_CHECKPOINTS = DIFFCSP_REPO / "checkpoints"
+DIFFCSP_REPO = Path(os.environ.get("DIFFCSP_REPO_DIR", Path(__file__).resolve().parents[5] / "DiffCSP-PP")).expanduser()
+DIFFCSP_CHECKPOINTS = Path(os.environ.get("DIFFCSP_CHECKPOINT_DIR", DIFFCSP_REPO / "checkpoints")).expanduser()
 
 # Available pre-trained models
 AVAILABLE_MODELS = {

@@ -6,7 +6,7 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-from src.utils.mcp_utils import setup_mcp_stdout, run_fastmcp_server
+from src.utils.mcp_utils import setup_mcp_stdout, run_mcp_server
 
 # Setup stdout redirection for MCP
 mcp_pipe_binary = setup_mcp_stdout()
@@ -14,7 +14,7 @@ mcp_pipe_binary = setup_mcp_stdout()
 import logging
 import warnings
 import json
-from mcp.server.fastmcp import FastMCP
+from mcp.server import MCPServer
 from typing import Dict, Any, Optional, Union
 from pathlib import Path
 
@@ -33,7 +33,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("DrugDiscServer")
 
 # Create MCP server
-mcp = FastMCP("drugdisc")
+mcp = MCPServer("drugdisc")
 
 
 @mcp.tool()
@@ -484,4 +484,4 @@ def compute_molecular_fingerprints(
 
 
 if __name__ == "__main__":
-    run_fastmcp_server(mcp, mcp_pipe_binary)
+    run_mcp_server(mcp, mcp_pipe_binary)

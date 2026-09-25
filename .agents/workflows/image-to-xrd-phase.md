@@ -2,12 +2,6 @@
 description: End-to-end workflow for digitizing an XRD plot image and identifying its crystalline phases.
 ---
 
-> Laboratory fork: this document supplies scientific methodology for Anvil Campaigns.
-> Anvil owns approvals, iteration state and provenance; anvil-machine owns submission.
-> Any upstream local tracking/submission examples below are reference material,
-> not instructions to create a parallel execution path.
-
-
 # Image to XRD Phase Analysis
 
 This workflow guides you through computationally identifying the crystalline phases of a material when your only starting point is an image or screenshot of an X-Ray Diffraction (XRD) plot.

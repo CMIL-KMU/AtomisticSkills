@@ -27,7 +27,7 @@ import argparse
 import json
 
 
-from atomistic_analysis.wannier import parse_wout as parse_wout
+from src.utils.analysis.wannier import parse_wout as parse_wout
 
 
 def main() -> None:

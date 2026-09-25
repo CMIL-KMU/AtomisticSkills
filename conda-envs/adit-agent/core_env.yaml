@@ -5,3 +5,5 @@ dependencies:
   - python=3.10
   - pip
   - uv
+  - pip:
+    - mcp>=2.2,<3

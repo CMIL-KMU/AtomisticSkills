@@ -9,6 +9,7 @@ dependencies:
   - uv
 
   - pip:
+    - mcp>=2.2,<3
     - pymatgen
     - ase
     - pyxtal

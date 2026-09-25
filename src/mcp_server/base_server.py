@@ -6,7 +6,7 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../")
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-from src.utils.mcp_utils import setup_mcp_stdout, run_fastmcp_server
+from src.utils.mcp_utils import setup_mcp_stdout, run_mcp_server
 from src.utils.config_utils import inject_config_into_env
 
 # Setup stdout redirection for MCP
@@ -15,8 +15,8 @@ inject_config_into_env()
 
 import logging
 import warnings
-from mcp.server.fastmcp import FastMCP
-from typing import Any, Optional
+from mcp.server import MCPServer
+from typing import Any, Optional, Union, List
 from pathlib import Path
 
 # Suppress all warnings to prevent protocol pollution
@@ -48,7 +48,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("BaseServer")
 
 # Create MCP server
-mcp = FastMCP("base_tools")
+mcp = MCPServer("base_tools")
 
 # Import literature utils
 
@@ -516,7 +516,7 @@ def search_literature(
 @mcp.tool()
 def supercell_expansion(
     structure_path: str,
-    scaling_matrix_json: Optional[str] = None,
+    scaling_matrix_json: Optional[Union[str, int, List[int], List[List[int]]]] = None,
     supercell_min_length: Optional[float] = None,
     save_to_file: Optional[str] = None,
 ) -> str:
@@ -524,7 +524,7 @@ def supercell_expansion(
 
     Args:
         structure_path: Path to the input structure file (e.g., CIF, POSCAR).
-        scaling_matrix_json: JSON string of a scaling matrix for generating the supercell (integer, list of 3 ints, or 3x3 matrix list).
+        scaling_matrix_json: Scaling matrix as JSON text or a structured integer/list; both forms are accepted by MCP.
         supercell_min_length: Minimum length (Å) for each lattice vector. Automatically expands supercell. Ignored if scaling_matrix is set.
         save_to_file: Optional path to save the generated structure. Optional.
 
@@ -553,7 +553,7 @@ def supercell_expansion(
             structure = structure_obj
 
         if scaling_matrix_json:
-            scaling_matrix = json.loads(scaling_matrix_json)
+            scaling_matrix = json.loads(scaling_matrix_json) if isinstance(scaling_matrix_json, str) else scaling_matrix_json
             structure.make_supercell(scaling_matrix)
         elif supercell_min_length is not None and supercell_min_length > 0.0:
             cell_lengths = structure.lattice.abc
@@ -681,7 +681,7 @@ def search_model_registry(
     backend: Optional[str] = None,
     max_energy_mae: Optional[float] = None,
     max_force_mae: Optional[float] = None,
-    tags_json: Optional[str] = None,
+    tags_json: Optional[Union[str, List[str]]] = None,
 ) -> str:
     """Search the local MLIP model registry for fine-tuned checkpoints.
 
@@ -700,7 +700,7 @@ def search_model_registry(
     try:
         import json
 
-        tags = json.loads(tags_json) if tags_json else None
+        tags = json.loads(tags_json) if isinstance(tags_json, str) and tags_json else tags_json or None
 
         matches = _registry_search(
             chemical_system=chemical_system,
@@ -745,7 +745,7 @@ def register_model(
     energy_mae: Optional[float] = None,
     force_mae: Optional[float] = None,
     research_dir: str = "",
-    tags_json: Optional[str] = None,
+    tags_json: Optional[Union[str, List[str]]] = None,
     notes: str = "",
     model_id: Optional[str] = None,
 ) -> str:
@@ -772,7 +772,7 @@ def register_model(
     try:
         import json
 
-        tags = json.loads(tags_json) if tags_json else None
+        tags = json.loads(tags_json) if isinstance(tags_json, str) and tags_json else tags_json or None
 
         assigned_id = _registry_register(
             checkpoint_path=checkpoint_path,
@@ -806,4 +806,4 @@ def register_model(
 
 
 if __name__ == "__main__":
-    run_fastmcp_server(mcp, mcp_pipe_binary)
+    run_mcp_server(mcp, mcp_pipe_binary)

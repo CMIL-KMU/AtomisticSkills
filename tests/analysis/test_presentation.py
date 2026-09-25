@@ -2,7 +2,7 @@
 
 import matplotlib.pyplot as plt
 from matplotlib import rc_params_from_file
-from atomistic_analysis.plotting import browser_style, plot_style, style_path
+from src.utils.analysis.plotting import browser_style, plot_style, style_path
 
 
 def test_lovelyplots_style_is_shared_and_scoped():
@@ -19,7 +19,7 @@ def test_lovelyplots_style_is_shared_and_scoped():
 
 def test_structure_renderer_preserves_recorded_cell():
     from pymatgen.core import Lattice, Structure
-    from atomistic_analysis.structure_viz import structure_3d_custom
+    from src.utils.analysis.structure_viz import structure_3d_custom
     from src.utils.structure_viz import structure_3d_custom as legacy
 
     assert legacy is structure_3d_custom

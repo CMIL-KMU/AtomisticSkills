@@ -32,13 +32,13 @@ import os
 
 import yaml
 
-from atomistic_analysis.edi_lifetime import COLUMNS as COLUMNS
+from src.utils.analysis.edi_lifetime import COLUMNS as COLUMNS
 
 
-from atomistic_analysis.edi_lifetime import parse_inv_tau as parse_inv_tau
+from src.utils.analysis.edi_lifetime import parse_inv_tau as parse_inv_tau
 
 
-from atomistic_analysis.edi_lifetime import summarize as summarize
+from src.utils.analysis.edi_lifetime import summarize as summarize
 
 
 def main() -> None:

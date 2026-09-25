@@ -18,7 +18,7 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
-from atomistic_analysis.scalars import calculate_voltage
+from src.utils.analysis.scalars import calculate_voltage
 
 
 def main():
