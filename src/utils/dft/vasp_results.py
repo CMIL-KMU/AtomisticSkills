@@ -1,7 +1,14 @@
-"""VASP numerical extraction with explicit energy and stress conventions."""
+"""VASP observations with explicit conventions and absent optional quantities.
+
+Full stress is required only for ISIF >= 2; trace-only ISIF=1 is not a tensor.
+Spectral objects are optional unless a consuming calculation requests them.
+Runtime extension parameters retain their OUTCAR origin separately from XML.
+"""
 
 from pathlib import Path
+from copy import copy
 import json
+import re
 from monty.json import MontyEncoder
 import numpy as np
 from ase.units import GPa
@@ -28,6 +35,9 @@ UNITS = dict(
 def ionic_observables(v):
     """One energy/stress convention for standalone parsing and workflow consumers."""
     steps = []
+    # ISIF=1 provides only a trace, not a usable full stress tensor.
+    parameters = dict(v.parameters, **v.incar)
+    full_stress = parameters.get("ISIF", 0 if parameters.get("IBRION") == 0 or parameters.get("LHFCALC") else 2) >= 2
     for step in v.ionic_steps:
         steps.append(
             dict(
@@ -39,7 +49,7 @@ def ionic_observables(v):
                     if k in step
                 },
                 forces=np.asarray(step["forces"]).tolist(),
-                stress=(-np.asarray(step["stress"]) * GPa / 10).tolist(),
+                **({"stress": (-np.asarray(step["stress"]) * GPa / 10).tolist()} if full_stress else {}),
             )
         )
     if not steps:
@@ -56,15 +66,18 @@ def parse_stage(directory):
     v = Vasprun(Path(directory) / "vasprun.xml", parse_potcar_file=False, parse_projected_eigen=False)
     outcar = Outcar(Path(directory) / "OUTCAR")
     steps = ionic_observables(v)
+    # Reuse pymatgen's LEPSILON/Exact/ordinary SCF rules for every ionic sample.
+    # Response iterations are not additional unconverged SCF iterations.
+    sample = copy(v)
+    electronic_converged = True
+    for step in v.ionic_steps:
+        sample.ionic_steps = [step]
+        electronic_converged &= bool(sample.converged_electronic)
     result = dict(
         units=UNITS,
         version=v.vasp_version,
         converged=bool(v.converged),
-        electronic_converged=bool(v.converged_electronic)
-        and all(
-            len(step.get("electronic_steps", [])) < v.parameters.get("NELM", 60)
-            for step in v.ionic_steps
-        ),
+        electronic_converged=electronic_converged,
         ionic_converged=bool(v.converged_ionic),
         initial_structure=v.initial_structure.as_dict(),
         steps=steps,
@@ -79,13 +92,42 @@ def parse_stage(directory):
         potcar_titles=v.potcar_symbols,
         run_stats=outcar.run_stats,
     )
-    if v.tdos is not None:
+    result["converged"] = result["converged"] and result["electronic_converged"]
+    text = (Path(directory) / "OUTCAR").read_text()
+    controls = {}
+    vtst = re.search(r"^\s*VTST: version\s+([\d.]+)", text, re.MULTILINE)
+    if vtst:
+        result["extensions"] = {"vtst": vtst[1]}
+    if v.parameters.get("IBRION", v.incar.get("IBRION")) == 40:
+        # XML omits these in VASP 6.4.1. Read the engine's runtime block,
+        # never the echoed user INCAR at the beginning of OUTCAR.
+        marker = "DAMPED VELOCITY VERLET ALGORITHM:"
+        if marker in text:
+            block = text.split(marker, 1)[1].split("IRC (A):", 1)[0]
+            controls = {k: value for k, value in Incar.from_str(block).items()
+                        if k in {"IRC_DIRECTION", "IRC_STOP", "IRC_MINSTEP", "IRC_MAXSTEP", "IRC_VNORM0", "IRC_DELTA0"}}
+    # VTST prints its own runtime controls rather than XML INCAR entries.
+    for key, pattern in {
+        "ICHAIN": r"^\s*CHAIN: Read ICHAIN\s+(\d+)",
+        "DROTMAX": r"^\s*Dimer: RotMax\s+(\d+)",
+        "DDR": r"^\s*Dimer:\s+dR\s+([\d.Ee+\-]+)",
+        "DFNMAX": r"^\s*Dimer:\s+FNMax\s+([\d.Ee+\-]+)",
+        "DFNMIN": r"^\s*Dimer:\s+FNMin\s+([\d.Ee+\-]+)",
+    }.items():
+        match = re.search(pattern, text, re.MULTILINE)
+        if match:
+            controls[key] = float(match[1])
+    if re.search(r"^\s*OPT: Using Conjugate-Gradient optimizer\s*$", text, re.MULTILINE):
+        controls["IOPT"] = 2
+    if controls:
+        result["outcar_parameters"] = controls
+    if getattr(v, "tdos", None) is not None:
         result["dos"] = dict(
             energies=v.tdos.energies.tolist(),
             densities={str(int(k)): x.tolist() for k, x in v.tdos.densities.items()},
             efermi=v.efermi,
         )
-    if v.eigenvalues is not None:
+    if getattr(v, "eigenvalues", None) is not None:
         result["bands"] = dict(
             kpoints=v.actual_kpoints,
             values={str(int(k)): x.tolist() for k, x in v.eigenvalues.items()},
