@@ -6,6 +6,7 @@ Runtime extension parameters retain their OUTCAR origin separately from XML.
 """
 
 from pathlib import Path
+from copy import copy
 import json
 import re
 from monty.json import MontyEncoder
@@ -65,15 +66,18 @@ def parse_stage(directory):
     v = Vasprun(Path(directory) / "vasprun.xml", parse_potcar_file=False, parse_projected_eigen=False)
     outcar = Outcar(Path(directory) / "OUTCAR")
     steps = ionic_observables(v)
+    # Reuse pymatgen's LEPSILON/Exact/ordinary SCF rules for every ionic sample.
+    # Response iterations are not additional unconverged SCF iterations.
+    sample = copy(v)
+    electronic_converged = True
+    for step in v.ionic_steps:
+        sample.ionic_steps = [step]
+        electronic_converged &= bool(sample.converged_electronic)
     result = dict(
         units=UNITS,
         version=v.vasp_version,
         converged=bool(v.converged),
-        electronic_converged=bool(v.converged_electronic)
-        and all(
-            len(step.get("electronic_steps", [])) < v.parameters.get("NELM", 60)
-            for step in v.ionic_steps
-        ),
+        electronic_converged=electronic_converged,
         ionic_converged=bool(v.converged_ionic),
         initial_structure=v.initial_structure.as_dict(),
         steps=steps,
