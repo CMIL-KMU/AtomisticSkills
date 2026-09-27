@@ -40,6 +40,7 @@ def load_foundation(root, identity, device):
         raise ValueError('Expected an audited MLIP inference checkpoint')
     targets = {'fairchem.core.models.base.HydraModel', 'fairchem.core.models.uma.escn_moe.eSCNMDMoeBackbone',
                'fairchem.core.models.uma.escn_md.MLP_EFS_Head', 'fairchem.core.models.uma.escn_moe.DatasetSpecificMoEWrapper',
+               'fairchem.core.models.uma.escn_moe.DatasetSpecificSingleHeadWrapper',
                'fairchem.core.units.mlip_unit.mlip_unit.Task', 'fairchem.core.modules.loss.DDPMTLoss',
                'fairchem.core.modules.loss.PerAtomMAELoss', 'fairchem.core.modules.loss.L2NormLoss',
                'fairchem.core.modules.loss.MAELoss',

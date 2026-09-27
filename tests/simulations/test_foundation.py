@@ -38,14 +38,16 @@ def test_installed_foundation_rejects_pickle_global_and_digest(tmp_path,payload,
     with pytest.raises(ValueError,match='hash differs'):load_foundation(tmp_path,identity,'cpu')
 
 
-def test_foundation_result_identity_comes_from_verified_spec(tmp_path, monkeypatch):
+@pytest.mark.parametrize('config', [{}, {'module': 'fairchem.core.models.uma.escn_moe.DatasetSpecificSingleHeadWrapper',
+                                        'head_cls': 'fairchem.core.models.uma.escn_md.MLP_EFS_Head'}])
+def test_foundation_result_identity_comes_from_verified_spec(tmp_path, monkeypatch, config):
     import torch
     from fairchem.core.units.mlip_unit.api.inference import MLIPInferenceCheckpoint
     from src.simulations.peregrine.foundation import load_foundation
     from peregrine.artifacts.store import canonical
     import peregrine.train.factory as factory
     checkpoint = tmp_path / 'checkpoint.pt'
-    torch.save(MLIPInferenceCheckpoint(model_config={}, model_state_dict={}, ema_state_dict={}, tasks_config={}), checkpoint)
+    torch.save(MLIPInferenceCheckpoint(model_config=config, model_state_dict={}, ema_state_dict={}, tasks_config={}), checkpoint)
     spec = dict(schema='anvil.uma-foundation/v1', sha256=hashlib.sha256(checkpoint.read_bytes()).hexdigest(), species=['Pt'], cutoff=6.0, task='oc22')
     raw = canonical(spec)
     identity = hashlib.sha256(raw).hexdigest()
