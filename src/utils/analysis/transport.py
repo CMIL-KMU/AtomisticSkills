@@ -11,7 +11,10 @@ DEFAULTS = dict(min_observations=30, smoothed=False, fit_start_ps=None, fit_end_
 
 def contract() -> dict:
     """Public defaults and semantics, available before trajectory/species selection."""
+    from src.utils.analysis.tools import source_identity
+
     return dict(
+        source_bundle_sha256=source_identity()["sha256"],
         schema="scientific-settings/v1",
         skill="mat-diffusion-analysis",
         source_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
