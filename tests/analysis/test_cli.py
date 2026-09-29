@@ -51,6 +51,11 @@ def test_diffusion_cli_and_no_overwrite(tmp_path, monkeypatch):
         output / "msd.svg"
     ).stat().st_size > 0
     assert (output / "input_configs.yaml").is_file()
+    import yaml
+
+    settings = yaml.safe_load((output / "input_configs.yaml").read_text())
+    assert settings["scientific_settings"]["origins"]["smoothed"] == "skill_default"
+    assert "smoothed" not in settings["scientific_settings"]["requested"]
     assert path.read_bytes() == original
     with pytest.raises(SystemExit):
         diffusion_main()

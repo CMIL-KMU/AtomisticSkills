@@ -172,3 +172,32 @@ def test_conflicting_timing_and_max_lag_resolution_are_rejected(tmp_path):
         analyze(
             path, dict(cfg, smoothed="max"), temperature_K=600, frame_interval_fs=2000
         )
+
+
+def test_default_review_and_original_time_plot(tmp_path):
+    import yaml
+    from src.utils.analysis.transport import review
+
+    cfg = dict(species="Li", charge=1, equilibration_ps=1)
+    baseline = review(cfg)
+    assert baseline["effective"]["smoothed"] is False and baseline["differences"] == []
+    changed = review(dict(cfg, smoothed="max"))
+    assert changed["differences"][0]["parameter"] == "smoothed"
+    assert changed["digest"] != baseline["digest"]
+    assert review(baseline["effective"])["digest"] == baseline["digest"]
+    result = analyze(
+        trajectory(tmp_path),
+        cfg,
+        timestep_ps=0.001,
+        temperature_K=600,
+        output_dir=tmp_path / "analysis",
+    )
+    csv = np.genfromtxt(tmp_path / "analysis/msd.csv", delimiter=",", names=True)
+    assert result["plot_time_axis"] == "md_time"
+    assert result["analysis_time_range_ps"] == [1, 8]
+    assert result["plot_time_range_ps"] == [1, 8]
+    assert csv["plot_time_ps"][0] == 1 and csv["plot_time_ps"][-1] == 8
+    np.testing.assert_allclose(csv["plot_time_ps"], csv["lag_ps"] + 1)
+    metadata = yaml.safe_load((tmp_path / "analysis/input_configs.yaml").read_text())
+    assert metadata["effective_configuration"]["smoothed"] is False
+    assert metadata["scientific_settings"]["origins"]["smoothed"] == "skill_default"

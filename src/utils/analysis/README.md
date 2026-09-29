@@ -29,3 +29,16 @@ Matplotlib, PyYAML and LovelyPlots 1.0.2 in the chosen environment. Structure PN
 also require pymatviz 0.18.0, Plotly 7.0.0, Kaleido 1.4.0 and an explicitly
 configured browser (`BROWSER_PATH`). `structure-png` accepts saved periodic
 coordinates on stdin and writes PNG bytes; other actions return JSON.
+
+`transport-contract` exposes defaults and parameter semantics; `transport-review`
+resolves a supplied configuration and reports explicit inputs, inherited defaults
+and deviations. Its digest binds effective settings to the scientific source.
+Consumers decide whether a deviation needs review; this utility never approves it.
+
+With default `smoothed=false`, plots show original MD time: a 0–30 ps trajectory
+with `equilibration_ps=5` displays 5–30 ps, relative to the structure at 5 ps.
+Fitting still uses elapsed lag time (0–25 ps). Multiple-origin `smoothed="max"`
+plots show lag time because there is no single original-time reference.
+`msd.csv` keeps `lag_ps,msd_angstrom2` and appends `plot_time_ps`.
+`input_configs.yaml` records requested/effective settings, source contract, input
+timing and the resolved analysis, plot and fit intervals. No old output is changed.

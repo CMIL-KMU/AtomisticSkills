@@ -20,7 +20,7 @@ def save(directory, name, result, settings):
 
 def diffusion_main():
     """Analyze one trajectory with user-selected ion, charge and explicit timing."""
-    from src.utils.analysis.transport import analyze, configuration
+    from src.utils.analysis.transport import analyze, configuration, review
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("trajectory")
@@ -31,29 +31,28 @@ def diffusion_main():
     timing.add_argument("--frame-interval-fs", type=float)
     timing.add_argument("--timestep-ps", type=float)
     parser.add_argument("--ignore_ps", type=float, required=True)
-    parser.add_argument("--smoothed", choices=["false", "max"], default="false")
-    parser.add_argument("--min-observations", type=int, default=30)
-    parser.add_argument("--fit-start-ps", type=float)
-    parser.add_argument("--fit-end-ps", type=float)
+    parser.add_argument(
+        "--smoothed", choices=["false", "max"], default=argparse.SUPPRESS
+    )
+    parser.add_argument("--min-observations", type=int, default=argparse.SUPPRESS)
+    parser.add_argument("--fit-start-ps", type=float, default=argparse.SUPPRESS)
+    parser.add_argument("--fit-end-ps", type=float, default=argparse.SUPPRESS)
     parser.add_argument("--output_dir", required=True)
     args = parser.parse_args()
     if Path(args.output_dir).exists():
         parser.error("Use a new output directory; prior analyses are immutable")
-    cfg = configuration(
-        dict(
-            species=args.species,
-            charge=args.charge,
-            equilibration_ps=args.ignore_ps,
-            smoothed=False if args.smoothed == "false" else "max",
-            min_observations=args.min_observations,
-            fit_start_ps=args.fit_start_ps,
-            fit_end_ps=args.fit_end_ps,
-        )
+    requested = dict(
+        species=args.species, charge=args.charge, equilibration_ps=args.ignore_ps
     )
+    for key in ("smoothed", "min_observations", "fit_start_ps", "fit_end_ps"):
+        if hasattr(args, key):
+            value = getattr(args, key)
+            requested[key] = False if key == "smoothed" and value == "false" else value
+    cfg = configuration(requested)
     with TemporaryDirectory() as temporary:
         result = analyze(
             args.trajectory,
-            cfg,
+            requested,
             temperature_K=args.temperature,
             timestep_ps=args.timestep_ps,
             frame_interval_fs=args.frame_interval_fs,
@@ -66,10 +65,20 @@ def diffusion_main():
             args.output_dir,
             "diffusion_results.json",
             result,
-            dict(vars(args), effective_configuration=cfg),
+            dict(
+                vars(args),
+                effective_configuration=cfg,
+                scientific_settings=review(requested),
+                timing={
+                    k: v
+                    for k, v in result.items()
+                    if k.endswith("_ps") or k == "plot_time_axis"
+                },
+            ),
         )
         for item in Path(temporary).iterdir():
-            shutil.copyfile(item, Path(args.output_dir) / item.name)
+            if item.name != "input_configs.yaml":
+                shutil.copyfile(item, Path(args.output_dir) / item.name)
 
 
 def arrhenius_main():

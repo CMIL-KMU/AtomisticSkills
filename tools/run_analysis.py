@@ -26,8 +26,16 @@ def dispatch(action, data):
         return tools.dependency_version(data["name"])
     if action == "dependencies":
         from importlib.metadata import PackageNotFoundError
+
         versions = {}
-        names = {"jsonschema", "ase", "numpy", "scipy", "pymatgen", "pymatgen-analysis-diffusion"}
+        names = {
+            "jsonschema",
+            "ase",
+            "numpy",
+            "scipy",
+            "pymatgen",
+            "pymatgen-analysis-diffusion",
+        }
         names.update(name for group in tools.DEPENDENCIES.values() for name in group)
         for name in sorted(names):
             try:
@@ -42,33 +50,65 @@ def dispatch(action, data):
         return True
     if action == "run":
         return tools.run(data["tool"], data["inputs"])
+    if action == "transport-contract":
+        from src.utils.analysis.transport import contract
+
+        return contract()
+    if action == "transport-review":
+        from src.utils.analysis.transport import review
+
+        return review(data)
     if action == "transport-config":
         from src.utils.analysis.transport import configuration
+
         return configuration(data)
     if action == "transport":
         from src.utils.analysis.transport import analyze
+
         return analyze(**data)
     if action == "arrhenius":
         from src.utils.analysis.arrhenius import fit_transport
+
         return fit_transport(**data)
     if action == "plot-arrhenius":
         from src.utils.analysis.cli import plot_arrhenius
+
         plot_arrhenius(data["result"], data["directory"])
         return True
     if action == "browser-style":
         from src.utils.analysis.plotting import browser_style
+
         return browser_style()
     raise ValueError("Unknown scientific action")
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=("describe", "source", "identity", "dependency", "dependencies",
-        "validate", "validate-report", "run", "transport-config", "transport",
-        "arrhenius", "plot-arrhenius", "browser-style", "structure-png"))
+    parser.add_argument(
+        "action",
+        choices=(
+            "describe",
+            "source",
+            "identity",
+            "dependency",
+            "dependencies",
+            "validate",
+            "validate-report",
+            "run",
+            "transport-config",
+            "transport-review",
+            "transport-contract",
+            "transport",
+            "arrhenius",
+            "plot-arrhenius",
+            "browser-style",
+            "structure-png",
+        ),
+    )
     args = parser.parse_args()
     if args.action == "structure-png":
         from src.utils.analysis.structure_cli import main as render
+
         render()
         return
     data = json.load(sys.stdin)

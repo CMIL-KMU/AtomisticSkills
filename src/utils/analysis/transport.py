@@ -6,6 +6,60 @@ from importlib.metadata import version
 from pathlib import Path
 
 
+DEFAULTS = dict(min_observations=30, smoothed=False, fit_start_ps=None, fit_end_ps=None)
+
+
+def contract() -> dict:
+    """Public defaults and semantics, available before trajectory/species selection."""
+    return dict(
+        schema="scientific-settings/v1",
+        skill="mat-diffusion-analysis",
+        source_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+        defaults=dict(DEFAULTS),
+        required=["species", "charge", "equilibration_ps"],
+        semantics=dict(
+            smoothed="Changes time-origin averaging, lag selection and fit weighting",
+            min_observations="Provider lag selection for multiple origins",
+            fit_start_ps="Fit lower bound in lag ps",
+            fit_end_ps="Fit upper bound in lag ps",
+        ),
+        time_axis=dict(single_origin="original MD time", multiple_origins="lag time"),
+    )
+
+
+def review(config: dict) -> dict:
+    """Describe effective scientific choices without imposing consumer approval policy."""
+    import json
+
+    effective = configuration(config)
+    definition = contract()
+    changes = [
+        dict(
+            parameter=k,
+            default=v,
+            selected=effective[k],
+            effect=definition["semantics"][k],
+        )
+        for k, v in DEFAULTS.items()
+        if effective[k] != v
+    ]
+    identity = dict(contract=definition, effective=effective)
+    checksum = hashlib.sha256(
+        json.dumps(
+            identity, sort_keys=True, separators=(",", ":"), allow_nan=False
+        ).encode()
+    ).hexdigest()
+    return dict(
+        identity,
+        digest=checksum,
+        requested=dict(config),
+        differences=changes,
+        origins={
+            k: ("explicit_input" if k in config else "skill_default") for k in effective
+        },
+    )
+
+
 def configuration(config: dict) -> dict:
     """Resolve and validate defaults without guessing ion charge or trajectory timing."""
     allowed = {
@@ -23,7 +77,7 @@ def configuration(config: dict) -> dict:
         raise ValueError(
             "Explicit species, charge and equilibration_ps required; unknown settings rejected"
         )
-    cfg = dict(min_observations=30, smoothed=False, fit_start_ps=None, fit_end_ps=None)
+    cfg = dict(DEFAULTS)
     cfg.update(config)
     if not isinstance(cfg["species"], str) or not cfg["species"]:
         raise ValueError("species must be an element symbol")
@@ -121,6 +175,7 @@ def analyze(
         raise ValueError("Uniform saved-frame times required")
     if cfg["smoothed"] == "max" and spacing[0] > 1.0 + 1e-12:
         raise ValueError("pymatgen max smoothing requires saved-frame spacing <= 1 ps")
+    raw_time_range = [float(times[0]), float(times[-1])]
     selected = times >= cfg["equilibration_ps"] - 1e-10
     frames = [a for a, keep in zip(frames, selected) if keep]
     times = times[selected]
@@ -160,6 +215,9 @@ def analyze(
         configuration=cfg,
         equilibration_ps=cfg["equilibration_ps"],
         production_duration_ps=float(times[-1] - times[0]),
+        raw_time_range_ps=raw_time_range,
+        analysis_time_range_ps=[float(times[0]), float(times[-1])],
+        reference_time_ps=float(times[0]) if cfg["smoothed"] is False else None,
         frames=len(frames),
         ion_count=int(ions.sum()),
         volume_angstrom3=float(first.get_volume()),
@@ -197,6 +255,13 @@ def analyze(
             reason="Insufficient production frames for the requested MSD estimator",
         )
     t, msd = analysis.dt, analysis.msd
+    offset = float(times[0]) if cfg["smoothed"] is False else 0.0
+    plot_time = t / 1000 + offset
+    report.update(
+        msd_lag_range_ps=[float(t[0] / 1000), float(t[-1] / 1000)],
+        plot_time_range_ps=[float(plot_time[0]), float(plot_time[-1])],
+        plot_time_axis="md_time" if cfg["smoothed"] is False else "lag_time",
+    )
     mask = np.ones(len(t), dtype=bool)
     if cfg["fit_start_ps"] is not None:
         mask &= t >= cfg["fit_start_ps"] * 1000
@@ -214,6 +279,7 @@ def analyze(
     variance = np.sum((fm - fm.mean()) ** 2)
     report.update(
         fit_lag_ps=[float(ft[0] / 1000), float(ft[-1] / 1000)],
+        fit_plot_time_ps=[float(ft[0] / 1000 + offset), float(ft[-1] / 1000 + offset)],
         msd_final_angstrom2=float(msd[-1]),
         fit_slope_angstrom2_fs=float(slope),
         fit_r2=float(1 - residual / variance) if variance > 0 else None,
@@ -239,11 +305,38 @@ def analyze(
     if output_dir is not None:
         out = Path(output_dir)
         out.mkdir(parents=True, exist_ok=True)
+        import yaml
+
+        settings = dict(
+            requested_configuration=dict(config),
+            effective_configuration=cfg,
+            temperature_K=temperature_K,
+            timestep_ps=timestep_ps,
+            frame_interval_fs=frame_interval_fs,
+            trajectory=str(path),
+            scientific_settings=review(config),
+            timing={
+                k: report[k]
+                for k in (
+                    "raw_time_range_ps",
+                    "analysis_time_range_ps",
+                    "reference_time_ps",
+                    "msd_lag_range_ps",
+                    "plot_time_range_ps",
+                    "plot_time_axis",
+                    "fit_lag_ps",
+                    "fit_plot_time_ps",
+                )
+            },
+        )
+        (out / "input_configs.yaml").write_text(
+            yaml.safe_dump(settings, sort_keys=True)
+        )
         np.savetxt(
             out / "msd.csv",
-            np.column_stack([t / 1000, msd]),
+            np.column_stack([t / 1000, msd, plot_time]),
             delimiter=",",
-            header="lag_ps,msd_angstrom2",
+            header="lag_ps,msd_angstrom2,plot_time_ps",
             comments="",
         )
         import matplotlib
@@ -256,10 +349,10 @@ def analyze(
         with plot_style():
             fig, axis = plt.subplots(figsize=(6, 5))
             axis.plot(
-                t / 1000, msd, label=cfg["species"] + " MSD", linewidth=2.5, marker=""
+                plot_time, msd, label=cfg["species"] + " MSD", linewidth=2.5, marker=""
             )
             axis.plot(
-                ft / 1000,
+                ft / 1000 + offset,
                 slope * ft + intercept,
                 "--",
                 label="fit",
@@ -267,7 +360,11 @@ def analyze(
                 marker="",
                 color="#ee9b00",
             )
-            axis.set_xlabel("Lag time (ps)", fontweight="bold")
+            axis.set_xlabel(
+                "MD time (ps)" if cfg["smoothed"] is False else "Lag time (ps)",
+                fontweight="bold",
+            )
+            axis.ticklabel_format(axis="x", style="plain", useOffset=False)
             axis.set_ylabel("MSD (angstrom²)", fontweight="bold")
             axis.set_title(f"{temperature_K:g} K — provisional")
             axis.legend(frameon=False)

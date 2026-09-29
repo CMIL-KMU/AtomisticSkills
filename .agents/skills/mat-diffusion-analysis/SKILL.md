@@ -20,6 +20,14 @@ transport estimates and identify evidence missing for scientific acceptance.
    origin; `max` uses multiple origins. Select a diffusive fit interval after
    inspecting MSD. Short trajectories and apparent straight lines do not establish
    convergence. Do not treat a live monitor's early stop as validated transport.
+   Preserve skill defaults unless the user chooses an alternative or an approved
+   research plan already specifies it. Report differences and their scientific
+   effect before execution; an example in another workflow is not a user choice.
+   `tools/run_analysis.py transport-review` exposes resolved defaults and changes.
+   The single-origin plot uses original MD time: discarding the first 5 ps of a
+   30 ps run gives a 5–30 ps axis, referenced to the 5 ps structure. Multiple-origin
+   plots use lag time, since they have no unique absolute reference time. Fit
+   bounds always refer to lag time. Config output records both coordinate systems.
 
 ```bash
 # Env: base-agent
