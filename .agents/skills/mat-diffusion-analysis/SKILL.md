@@ -24,10 +24,13 @@ transport estimates and identify evidence missing for scientific acceptance.
    research plan already specifies it. Report differences and their scientific
    effect before execution; an example in another workflow is not a user choice.
    `tools/run_analysis.py transport-review` exposes resolved defaults and changes.
-   The single-origin plot uses original MD time: discarding the first 5 ps of a
-   30 ps run gives a 5–30 ps axis, referenced to the 5 ps structure. Multiple-origin
-   plots use lag time, since they have no unique absolute reference time. Fit
-   bounds always refer to lag time. Config output records both coordinate systems.
+   The single-origin plot shows the entire available simulation, referenced to
+   its first frame: 30 ps MD gives a 0–30 ps axis. With equilibration_ps=5, the
+   first 5 ps remain visible and shaded but are excluded from the linear fit.
+   Multiple-origin plots use lag time after equilibration instead; they have no
+   unique absolute reference time. Fit bounds are lag times from the recorded
+   reference. The intercept is free; do not force the line through zero. Config
+   output records analysis/plot/fit intervals, and CSV marks included fit points.
 
 ```bash
 # Env: base-agent

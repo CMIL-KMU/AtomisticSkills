@@ -26,7 +26,10 @@ def contract() -> dict:
             fit_start_ps="Fit lower bound in lag ps",
             fit_end_ps="Fit upper bound in lag ps",
         ),
-        time_axis=dict(single_origin="original MD time", multiple_origins="lag time"),
+        time_axis=dict(
+            single_origin="full original MD time; reference is trajectory start; equilibration excluded from fit",
+            multiple_origins="lag time",
+        ),
     )
 
 
@@ -180,12 +183,14 @@ def analyze(
         raise ValueError("pymatgen max smoothing requires saved-frame spacing <= 1 ps")
     raw_time_range = [float(times[0]), float(times[-1])]
     selected = times >= cfg["equilibration_ps"] - 1e-10
-    frames = [a for a, keep in zip(frames, selected) if keep]
-    times = times[selected]
-    if len(frames) < 4 or len({a.info.get("system_id") for a in frames}) != 1:
+    retained_times = times[selected]
+    if len(retained_times) < 4 or len({a.info.get("system_id") for a in frames}) != 1:
         raise ValueError(
             "One ordered trajectory and at least four production frames required"
         )
+    if cfg["smoothed"] == "max":
+        frames = [a for a, keep in zip(frames, selected) if keep]
+        times = retained_times
     first = frames[0]
     ions = first.numbers == atomic_numbers[cfg["species"]]
     if not ions.any() or ions.all() or first.get_volume() <= 0:
@@ -217,11 +222,13 @@ def analyze(
         temperature_K=temperature_K,
         configuration=cfg,
         equilibration_ps=cfg["equilibration_ps"],
-        production_duration_ps=float(times[-1] - times[0]),
+        production_duration_ps=float(retained_times[-1] - retained_times[0]),
         raw_time_range_ps=raw_time_range,
-        analysis_time_range_ps=[float(times[0]), float(times[-1])],
+        analysis_time_range_ps=[float(retained_times[0]), float(retained_times[-1])],
         reference_time_ps=float(times[0]) if cfg["smoothed"] is False else None,
         frames=len(frames),
+        production_frames=len(retained_times),
+        fit_intercept_policy="free",
         ion_count=int(ions.sum()),
         volume_angstrom3=float(first.get_volume()),
         provider="pymatgen-analysis-diffusion",
@@ -265,7 +272,11 @@ def analyze(
         plot_time_range_ps=[float(plot_time[0]), float(plot_time[-1])],
         plot_time_axis="md_time" if cfg["smoothed"] is False else "lag_time",
     )
-    mask = np.ones(len(t), dtype=bool)
+    mask = (
+        plot_time >= float(retained_times[0]) - 1e-10
+        if cfg["smoothed"] is False
+        else np.ones(len(t), dtype=bool)
+    )
     if cfg["fit_start_ps"] is not None:
         mask &= t >= cfg["fit_start_ps"] * 1000
     if cfg["fit_end_ps"] is not None:
@@ -285,6 +296,7 @@ def analyze(
         fit_plot_time_ps=[float(ft[0] / 1000 + offset), float(ft[-1] / 1000 + offset)],
         msd_final_angstrom2=float(msd[-1]),
         fit_slope_angstrom2_fs=float(slope),
+        fit_intercept_angstrom2=float(intercept),
         fit_r2=float(1 - residual / variance) if variance > 0 else None,
         max_framework_displacement_angstrom=float(analysis.max_framework_displacement),
     )
@@ -337,9 +349,9 @@ def analyze(
         )
         np.savetxt(
             out / "msd.csv",
-            np.column_stack([t / 1000, msd, plot_time]),
+            np.column_stack([t / 1000, msd, plot_time, mask.astype(int)]),
             delimiter=",",
-            header="lag_ps,msd_angstrom2,plot_time_ps",
+            header="lag_ps,msd_angstrom2,plot_time_ps,fit_included",
             comments="",
         )
         import matplotlib
@@ -351,6 +363,14 @@ def analyze(
 
         with plot_style():
             fig, axis = plt.subplots(figsize=(6, 5))
+            if cfg["smoothed"] is False and retained_times[0] > times[0]:
+                axis.axvspan(
+                    float(times[0]),
+                    float(retained_times[0]),
+                    color="#eeeeee",
+                    alpha=1,
+                    label="equilibration (not fitted)",
+                )
             axis.plot(
                 plot_time, msd, label=cfg["species"] + " MSD", linewidth=2.5, marker=""
             )

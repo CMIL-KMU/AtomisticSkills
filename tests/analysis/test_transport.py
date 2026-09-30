@@ -195,9 +195,39 @@ def test_default_review_and_original_time_plot(tmp_path):
     csv = np.genfromtxt(tmp_path / "analysis/msd.csv", delimiter=",", names=True)
     assert result["plot_time_axis"] == "md_time"
     assert result["analysis_time_range_ps"] == [1, 8]
-    assert result["plot_time_range_ps"] == [1, 8]
-    assert csv["plot_time_ps"][0] == 1 and csv["plot_time_ps"][-1] == 8
-    np.testing.assert_allclose(csv["plot_time_ps"], csv["lag_ps"] + 1)
+    assert result["plot_time_range_ps"] == [0, 8]
+    assert result["reference_time_ps"] == 0
+    assert result["fit_lag_ps"] == [1, 8]
+    assert result["fit_intercept_policy"] == "free"
+    assert csv["plot_time_ps"][0] == 0 and csv["plot_time_ps"][-1] == 8
+    np.testing.assert_allclose(csv["plot_time_ps"], csv["lag_ps"])
+    assert csv["msd_angstrom2"][0] == pytest.approx(0)
+    np.testing.assert_array_equal(csv["fit_included"], csv["plot_time_ps"] >= 1)
+    # Match the provider on the full trajectory with the early fit interval excluded.
+    from ase.io import read
+    from pymatgen.io.ase import AseAtomsAdaptor
+    from pymatgen.analysis.diffusion.analyzer import (
+        DiffusionAnalyzer,
+        get_diffusivity_from_msd,
+    )
+
+    full = DiffusionAnalyzer.from_structures(
+        [
+            AseAtomsAdaptor.get_structure(a)
+            for a in read(tmp_path / "trajectory.xyz", ":")
+        ],
+        "Li",
+        600,
+        time_step=1,
+        step_skip=10,
+        smoothed=False,
+    )
+    np.testing.assert_allclose(csv["msd_angstrom2"], full.msd, atol=1e-12)
+    selected = full.dt >= 1000
+    expected, _ = get_diffusivity_from_msd(
+        full.msd[selected], full.dt[selected], smoothed=False
+    )
+    assert result["diffusivity_cm2_s"] == pytest.approx(expected, rel=1e-10)
     metadata = yaml.safe_load((tmp_path / "analysis/input_configs.yaml").read_text())
     assert metadata["effective_configuration"]["smoothed"] is False
     assert metadata["scientific_settings"]["origins"]["smoothed"] == "skill_default"

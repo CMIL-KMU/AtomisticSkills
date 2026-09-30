@@ -35,10 +35,17 @@ resolves a supplied configuration and reports explicit inputs, inherited default
 and deviations. Its digest binds effective settings to the scientific source.
 Consumers decide whether a deviation needs review; this utility never approves it.
 
-With default `smoothed=false`, plots show original MD time: a 0–30 ps trajectory
-with `equilibration_ps=5` displays 5–30 ps, relative to the structure at 5 ps.
-Fitting still uses elapsed lag time (0–25 ps). Multiple-origin `smoothed="max"`
-plots show lag time because there is no single original-time reference.
-`msd.csv` keeps `lag_ps,msd_angstrom2` and appends `plot_time_ps`.
+With default `smoothed=false`, plots show the full available original MD time:
+a 0–30 ps trajectory with `equilibration_ps=5` displays 0–30 ps, referenced to
+the first frame. The first 5 ps are shaded and excluded from the fit; they are
+not deleted from the MSD curve. Fit bounds remain lag times from that reference
+and are intersected with the post-equilibration interval. Multiple-origin
+`smoothed="max"` still uses post-equilibration frames and lag-time plotting.
+`msd.csv` keeps `lag_ps,msd_angstrom2,plot_time_ps` and appends `fit_included`.
+The linear fit has a free intercept, recorded separately in the result.
 `input_configs.yaml` records requested/effective settings, source contract, input
 timing and the resolved analysis, plot and fit intervals. No old output is changed.
+
+This full-time single-origin convention uses the first trajectory frame as its
+reference, unlike the previous post-equilibration reference. It can change fitted
+values; preserve the source identity and do not relabel earlier analyses.
